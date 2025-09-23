@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="es">
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -83,7 +83,7 @@
 
 <div class="d-flex">
     <!-- Reemplazamos el sidebar estático con el fragmento dinámico -->
-    <div th:replace="~{sidebar :: sidebar(activeUri='/')}"></div>
+    <div th:replace="~{GestionTienda/sidebar :: sidebar(activeUri='/')}"></div>
 
     <div id="main-content" class="main-content w-100">
         <header class="p-3 mb-3 border-bottom bg-white shadow-sm">
@@ -171,6 +171,24 @@
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 <script src="https://code.jquery.com/jquery-3.7.0.js"></script> <!-- Necesario para main.js -->
 <script th:src="@{/js/main.js}"></script> <!-- Script común para sidebar -->
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script th:inline="javascript">
+    document.addEventListener('DOMContentLoaded', function() {
+        /*[# th:if="${bienvenida}"]*/
+        const bienvenidaMessage = /*[[${bienvenida}]]*/ null;
+        if (bienvenidaMessage) {
+            Swal.fire({
+                icon: 'success',
+                title: '¡Bienvenido!',
+                text: bienvenidaMessage,
+                timer: 3000,
+                showConfirmButton: false,
+                timerProgressBar: true
+            });
+        }
+        /*[/]*/
+    });
+</script>
 
 </body>
 </html>
