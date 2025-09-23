@@ -10,14 +10,14 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="/css/main.css">
+    <link rel="stylesheet" th:href="@{/css/main.css}">
 
 </head>
 <body>
 
 <div class="d-flex">
     <!-- Reemplazamos el sidebar estático con el fragmento dinámico -->
-    <div th:replace="~{GestionTienda/sidebar :: sidebar(activeUri='/')}"></div>
+    <div th:replace="~{GestionTienda/sidebar :: sidebar(activeUri='/dashboard')}"></div>
 
     <div id="main-content" class="main-content w-100">
         <header class="p-3 mb-3 border-bottom bg-white shadow-sm">
