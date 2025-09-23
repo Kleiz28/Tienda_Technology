@@ -25,7 +25,7 @@ public class DashboardController {
     // @GetMapping("/"): Asocia este método a las peticiones HTTP GET para la URL
     // raíz ("/").
     // Es la página principal que se muestra después de iniciar sesión.
-    @GetMapping("/")
+    @GetMapping("/dashboard")
     public String mostrarDashboard(Model model) {
         // 1. Llama al método contarUsuarios() del servicio para obtener el número total
         // de usuarios activos e inactivos (excluyendo los eliminados).

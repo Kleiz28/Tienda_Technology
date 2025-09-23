@@ -29,9 +29,8 @@ public class LoginController {
     public String mostrarFormularioLogin(HttpSession session) {
         // Comprueba si ya existe un usuario en la sesión actual.
         if (session.getAttribute("usuarioLogueado") != null) {
-            // Si ya ha iniciado sesión, lo redirige a la página principal para no mostrarle
-            // el login de nuevo.
-            return "redirect:/";
+            // Si ya ha iniciado sesión, redirige al DASHBOARD, no a la raíz
+            return "redirect:/dashboard";  // ← Cambiado de "/" a "/dashboard"
         }
         // Si no ha iniciado sesión, muestra la página de login.
         return "GestionTienda/login";
@@ -77,7 +76,7 @@ public class LoginController {
                     .toList();
             session.setAttribute("menuOpciones", opcionesMenu);
             redirectAttributes.addFlashAttribute("bienvenida", "¡Bienvenido " + usuarioEncontrado.getNombre() + "!");
-            return "redirect:/"; // Redirige al dashboard en caso de éxito
+            return "redirect:/dashboard"; // Redirige al dashboard en caso de éxito
         } else {
             // Si la contraseña es incorrecta, mostramos un mensaje de error.
             redirectAttributes.addFlashAttribute("error", "Contraseña incorrecta.");
