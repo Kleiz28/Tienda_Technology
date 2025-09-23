@@ -124,6 +124,7 @@ $(document).ready(function() {
         $('#tablaUsuarios tbody').on('click', '.action-status', handleToggleStatus);
         $('#tablaUsuarios tbody').on('click', '.action-delete', handleDelete);
     }
+    setupPhotoPreview();
 
     /**
      * Carga la lista de usuarios desde el backend y redibuja la tabla
@@ -165,12 +166,22 @@ $(document).ready(function() {
     /**
      * Guarda un usuario (crear o actualizar)
      */
+    // usuarios.js - REEMPLAZA la función saveUsuario()
     function saveUsuario() {
         clearFieldErrors();
 
-        const formData = {
+        // Crear FormData para enviar archivos
+        const formData = new FormData();
+        const fotoFile = $('#fotoFile')[0].files[0];
+
+        // Agregar archivo si existe
+        if (fotoFile) {
+            formData.append('fotoFile', fotoFile);
+        }
+
+        // Datos del usuario como JSON
+        const usuarioData = {
             id: $('#id').val() || null,
-            foto: $('#fotoFile').val(),
             nombre: $('#nombre').val().trim(),
             usuario: $('#usuario').val().trim(),
             clave: $('#clave').val(),
@@ -180,50 +191,149 @@ $(document).ready(function() {
             }
         };
 
+        // Si es edición y la clave está vacía, no enviarla
+        if (isEditing && !usuarioData.clave) {
+            delete usuarioData.clave;
+        }
+
         // Validación básica del lado cliente
-        if (!validateForm(formData)) {
+        if (!validateForm(usuarioData)) {
             return;
         }
 
-        // Si es edición y la clave está vacía, no enviarla
-        if (isEditing && !formData.clave) {
-            delete formData.clave;
-        }
+        // Agregar datos del usuario como JSON string
+        formData.append('usuario', JSON.stringify(usuarioData));
 
         showLoading(true);
 
         fetch(ENDPOINTS.save, {
             method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify(formData)
+            body: formData // No establecer Content-Type, el navegador lo hará automáticamente
         })
-        .then(response => response.json())
-        .then(data => {
-            if (data.success) {
-                hideModal();
-                showNotification(data.message, 'success');
-                loadUsuarios(); // Recargar la tabla
-            } else {
-                if (data.errors) {
-                    // Mostrar errores de validación del servidor
-                    Object.keys(data.errors).forEach(field => {
-                        showFieldError(field, data.errors[field]);
-                    });
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    hideModal();
+                    showNotification(data.message, 'success');
+                    loadUsuarios(); // Recargar la tabla
                 } else {
                     showNotification(data.message, 'error');
                 }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                showNotification('Error de conexión al guardar usuario', 'error');
+            })
+            .finally(() => {
+                showLoading(false);
+            });
+    }
+
+// AGREGAR función para previsualizar foto
+    function setupPhotoPreview() {
+        $('#fotoFile').on('change', function(e) {
+            const file = e.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    $('#fotoPreview').attr('src', e.target.result);
+                }
+                reader.readAsDataURL(file);
             }
-        })
-        .catch(error => {
-            console.error('Error:', error);
-            showNotification('Error de conexión al guardar usuario', 'error');
-        })
-        .finally(() => {
-            showLoading(false);
         });
     }
+
+// MODIFICAR la función openModalForEdit() para mostrar foto
+    function openModalForEdit(usuario) {
+        isEditing = true;
+        clearForm();
+        $('#modalTitle').text('Editar Usuario');
+
+        $('#id').val(usuario.id);
+        $('#nombre').val(usuario.nombre);
+        $('#usuario').val(usuario.usuario);
+        $('#correo').val(usuario.correo);
+        $('#id_perfil').val(usuario.perfil ? usuario.perfil.id : '');
+        $('#clave').val('').prop('required', false).attr('placeholder', 'Dejar en blanco para no cambiar');
+
+        // Mostrar foto actual si existe
+        if (usuario.foto) {
+            $('#fotoPreview').attr('src', '/fotos/' + usuario.foto).show();
+        } else {
+            $('#fotoPreview').hide();
+        }
+
+        showModal();
+    }
+
+// MODIFICAR la función openModalForNew()
+    function openModalForNew() {
+        isEditing = false;
+        clearForm();
+        $('#modalTitle').text('Agregar Usuario');
+        $('#clave').prop('required', true).attr('placeholder', '');
+        $('#fotoPreview').hide(); // Ocultar preview en nuevo usuario
+        showModal();
+    }
+
+// MODIFICAR la función initializeDataTable() para mostrar imágenes
+    function initializeDataTable() {
+        dataTable = $('#tablaUsuarios').DataTable({
+            responsive: true,
+            processing: true,
+            ajax: {
+                url: ENDPOINTS.list,
+                dataSrc: 'data'
+            },
+            columns: [
+                { data: 'id' },
+                {
+                    data: 'foto',
+                    render: function(data, type, row) {
+                        if (data) {
+                            return `<img src="/fotos/${data}" class="worker-photo" alt="Foto de ${row.nombre}" onerror="this.src='data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNTAiIGhlaWdodD0iNTAiIHZpZXdCb3g9IjAgMCAyNCAyNCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHJlY3Qgd2lkdGg9IjI0IiBoZWlnaHQ9IjI0IiBmaWxsPSIjZGVlMmU2Ii8+Cjx0ZXh0IHg9IjEyIiB5PSIxMiIgZm9udC1mYW1pbHk9IkFyaWFsLCBzYW5zLXNlcmlmIiBmb250LXNpemU9IjEyIiBmaWxsPSIjNmM3NTdkIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBkeT0iLjNlbSI+PGtleXM+PHQ+PHQ+PGtleT48dD48dD5ObyBJbWFnZTwvdD48L3Q+PC9rZXk+PC90PjwvdD48L2tleXM+PC90ZXh0Pgo8L3N2Zz4K'">`;
+                        } else {
+                            return `<div class="worker-photo bg-light d-flex align-items-center justify-content-center">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="#6c757d" viewBox="0 0 16 16">
+                                        <path d="M6.5 8a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3z"/>
+                                        <path d="M0 2a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2V2zm8 9a4 4 0 1 0 0-8 4 4 0 0 0 0 8z"/>
+                                    </svg>
+                                </div>`;
+                        }
+                    }
+                },
+                { data: 'nombre' },
+                { data: 'usuario' },
+                { data: 'perfil.nombre' },
+                { data: 'correo' },
+                {
+                    data: 'estado',
+                    render: function(data, type, row) {
+                        return data === 1
+                            ? '<span class="badge text-bg-success">Activo</span>'
+                            : '<span class="badge text-bg-danger">Inactivo</span>';
+                    }
+                },
+                {
+                    data: null,
+                    orderable: false,
+                    searchable: false,
+                    render: function(data, type, row) {
+                        return createActionButtons(row);
+                    }
+                }
+            ],
+            columnDefs: [
+                { responsivePriority: 1, targets: 2 }, // Nombre
+                { responsivePriority: 2, targets: 7 }, // Acciones
+            ],
+            language: {
+                url: "//cdn.datatables.net/plug-ins/1.13.6/i18n/es-ES.json",
+            },
+            pageLength: 10
+        });
+    }
+
 
     /**
      * Maneja la edición de un usuario
@@ -329,36 +439,6 @@ $(document).ready(function() {
                 });
             }
         });
-    }
-
-    /**
-     * Abre el modal para crear nuevo usuario
-     */
-    function openModalForNew() {
-        isEditing = false;
-        clearForm();
-        $('#modalTitle').text('Agregar Usuario');
-        $('#clave').prop('required', true).attr('placeholder', '');
-        showModal();
-    }
-
-    /**
-     * Abre el modal para editar usuario
-     */
-    function openModalForEdit(usuario) {
-        isEditing = true;
-        clearForm();
-        $('#modalTitle').text('Editar Usuario');
-
-        $('#id').val(usuario.id);
-        $('#fotoFile').val(usuario.foto);
-        $('#nombre').val(usuario.nombre);
-        $('#usuario').val(usuario.usuario);
-        $('#correo').val(usuario.correo);
-        $('#id_perfil').val(usuario.perfil ? usuario.perfil.id : '');
-        $('#clave').val('').prop('required', false).attr('placeholder', 'Dejar en blanco para no cambiar');
-
-        showModal();
     }
 
     /**

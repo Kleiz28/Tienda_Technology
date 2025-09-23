@@ -10,7 +10,10 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
-
+import org.springframework.web.multipart.MultipartFile;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import org.springframework.http.MediaType;
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -70,35 +73,48 @@ public class UsuarioController {
     // @RequestBody: Convierte el cuerpo JSON de la petición en un objeto Usuario.
     // @Valid: Activa las validaciones definidas en el modelo Usuario (ej.
     // @NotBlank).
-    @PostMapping("/api/guardar")
+    @PostMapping(value = "/api/guardar", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     @ResponseBody
-    public ResponseEntity<?> guardarUsuarioAjax(@Valid @RequestBody Usuario usuario, BindingResult bindingResult) {
+    public ResponseEntity<?> guardarUsuarioAjax(
+            @RequestParam(value = "fotoFile", required = false) MultipartFile fotoFile,
+            @RequestParam("usuario") String usuarioJson) throws IOException {
+
         Map<String, Object> response = new HashMap<>();
 
-        // Si hay errores de validación (ej. un campo obligatorio está vacío).
-        if (bindingResult.hasErrors()) {
-            // Recopila los errores y los devuelve en la respuesta JSON.
-            Map<String, String> errores = new HashMap<>();
-            bindingResult.getFieldErrors().forEach(error -> errores.put(error.getField(), error.getDefaultMessage()));
-            response.put("success", false);
-            response.put("message", "Datos inválidos");
-            response.put("errors", errores);
-            return ResponseEntity.badRequest().body(response);
-        }
-
         try {
-            // Llama al servicio para guardar el usuario.
-            Usuario usuarioGuardado = usuarioService.guardarUsuario(usuario);
+            // Convertir JSON string a objeto Usuario
+            ObjectMapper objectMapper = new ObjectMapper();
+            Usuario usuario = objectMapper.readValue(usuarioJson, Usuario.class);
+
+            // Validaciones manuales básicas
+            if (usuario.getNombre() == null || usuario.getNombre().trim().isEmpty()) {
+                response.put("success", false);
+                response.put("message", "El nombre es obligatorio");
+                return ResponseEntity.badRequest().body(response);
+            }
+
+            if (usuario.getUsuario() == null || usuario.getUsuario().trim().isEmpty()) {
+                response.put("success", false);
+                response.put("message", "El usuario es obligatorio");
+                return ResponseEntity.badRequest().body(response);
+            }
+
+            if (usuario.getCorreo() == null || usuario.getCorreo().trim().isEmpty()) {
+                response.put("success", false);
+                response.put("message", "El correo es obligatorio");
+                return ResponseEntity.badRequest().body(response);
+            }
+
+            // Llama al servicio para guardar el usuario con la foto
+            Usuario usuarioGuardado = usuarioService.guardarUsuario(usuario, fotoFile);
             response.put("success", true);
             response.put("usuario", usuarioGuardado);
-            response.put("message",
-                    usuario.getId() != null ? "Usuario actualizado correctamente" : "Usuario creado correctamente");
+            response.put("message", usuario.getId() != null ? "Usuario actualizado correctamente" : "Usuario creado correctamente");
             return ResponseEntity.ok(response);
+
         } catch (Exception e) {
-            // Captura cualquier excepción del servicio (ej. usuario duplicado) y la
-            // devuelve como error.
             response.put("success", false);
-            response.put("message", "Error interno del servidor: " + e.getMessage());
+            response.put("message", "Error: " + e.getMessage());
             return ResponseEntity.internalServerError().body(response);
         }
     }

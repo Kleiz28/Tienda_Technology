@@ -56,6 +56,32 @@
             cursor: pointer;
         }
 
+        .worker-photo {
+            width: 50px;
+            height: 50px;
+            object-fit: cover;
+            border-radius: 50%;
+            border: 2px solid #dee2e6;
+        }
+
+        #fotoPreview {
+            width: 150px;
+            height: 150px;
+            object-fit: cover;
+            border-radius: 50%;
+            border: 3px solid #007bff;
+        }
+
+        .photo-placeholder {
+            background-color: #f8f9fa;
+            border: 2px dashed #dee2e6;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #6c757d;
+        }
+
         .main-content {
             transition: margin-left .3s ease-in-out;
         }
@@ -161,6 +187,10 @@
                         <div class="col-md-6">
                             <label for="fotoFile" class="form-label">Foto</label>
                             <input class="form-control" type="file" id="fotoFile" accept="image/*">
+                            <!-- Agregar previsualización -->
+                            <div class="mt-2 text-center">
+                                <img id="fotoPreview" src="" alt="Vista previa" class="worker-photo" style="display: none;">
+                            </div>
                         </div>
                         <div class="col-md-6">
                             <label for="usuario" class="form-label">Usuario:</label>

@@ -2,19 +2,28 @@ package com.example.tienda_technology.service;
 
 import com.example.tienda_technology.model.Usuario;
 import com.example.tienda_technology.repository.UsuarioRepository;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 @Service
 public class UsuarioService {
 
     private final UsuarioRepository usuarioRepository;
     private final BCryptPasswordEncoder passwordEncoder;
+    @Value("${file.upload-dir}")
+    private String uploadDir;
 
     public UsuarioService(UsuarioRepository usuarioRepository) {
         this.usuarioRepository = usuarioRepository;
@@ -30,7 +39,7 @@ public class UsuarioService {
     }
 
     @Transactional
-    public Usuario guardarUsuario(Usuario usuario) {
+    public Usuario guardarUsuario(Usuario usuario, MultipartFile fotoFile) throws IOException  {
         try {
             // Validaciones adicionales
             if (usuario.getNombre() == null || usuario.getNombre().trim().isEmpty()) {
@@ -76,6 +85,15 @@ public class UsuarioService {
                 usuario.setEstado(1);
             }
 
+            if (fotoFile != null && !fotoFile.isEmpty()) {
+                // Si se está actualizando y ya existe una foto, se elimina la anterior
+                if (usuario.getId() != null && usuario.getFoto() != null) {
+                    eliminarFoto(usuario.getFoto());
+                }
+                String nombreFoto = guardarFoto(fotoFile);
+                usuario.setFoto(nombreFoto);
+            }
+
             return usuarioRepository.save(usuario);
 
         } catch (DataIntegrityViolationException e) {
@@ -92,6 +110,46 @@ public class UsuarioService {
             throw new RuntimeException("Error al guardar el usuario: " + e.getMessage(), e);
         }
     }
+
+
+    /**
+     * Guarda el archivo de imagen en el servidor.
+     *
+     * @param fotoFile Archivo de imagen a guardar.
+     * @return El nombre único del archivo guardado.
+     * @throws IOException Si ocurre un error durante la escritura del archivo.
+     */
+    private String guardarFoto(MultipartFile fotoFile) throws IOException {
+        // Genera un nombre de archivo único para evitar colisiones
+        String nombreUnico = UUID.randomUUID().toString() + "_" + fotoFile.getOriginalFilename();
+        Path rutaCompleta = Paths.get(uploadDir + nombreUnico);
+
+        // Crea el directorio si no existe
+        Files.createDirectories(rutaCompleta.getParent());
+
+        // Escribe el archivo en el disco
+        Files.write(rutaCompleta, fotoFile.getBytes());
+        return nombreUnico;
+    }
+
+    /**
+     * Elimina un archivo de foto del sistema de archivos.
+     *
+     * @param nombreFoto El nombre del archivo de foto a eliminar.
+     */
+    private void eliminarFoto(String nombreFoto) {
+        if (nombreFoto == null || nombreFoto.isEmpty()) {
+            return;
+        }
+        try {
+            Path rutaFoto = Paths.get(uploadDir + nombreFoto);
+            Files.deleteIfExists(rutaFoto);
+        } catch (IOException e) {
+            // Maneja la excepción, por ejemplo, registrándola.
+            System.err.println("Error al eliminar la foto: " + nombreFoto + " - " + e.getMessage());
+        }
+    }
+
 
     @Transactional(readOnly = true)
     public long contarUsuarios() {
@@ -123,7 +181,7 @@ public class UsuarioService {
         // Borrado lógico: cambiamos el estado a 2
         Usuario usuario = obtenerUsuarioPorId(id)
                 .orElseThrow(() -> new IllegalArgumentException("Usuario no encontrado"));
-
+        eliminarFoto(usuario.getFoto());
         usuario.setEstado(2); // 2 significa "eliminado"
         usuarioRepository.save(usuario);
     }
