@@ -34,7 +34,7 @@ public class LoginController {
             return "redirect:/";
         }
         // Si no ha iniciado sesión, muestra la página de login.
-        return "login";
+        return "GestionTienda/login";
     }
 
     // Maneja las peticiones POST a /login, que se envían desde el formulario.
@@ -49,7 +49,7 @@ public class LoginController {
             // addFlashAttribute guarda un mensaje que sobrevive a una redirección. Es ideal
             // para mostrar errores.
             redirectAttributes.addFlashAttribute("error", "Usuario no encontrado.");
-            return "redirect:/login";
+            return "redirect:GestionTienda/login";
         }
 
         // Si se encontró, obtenemos el objeto Usuario.
@@ -59,7 +59,7 @@ public class LoginController {
         // pueden iniciar sesión.
         if (usuarioEncontrado.getEstado() != 1) { // 1 = Activo
             redirectAttributes.addFlashAttribute("error", "Este usuario se encuentra inactivo.");
-            return "redirect:/login";
+            return "redirect:GestionTienda/login";
         }
 
         // Verificamos si la contraseña proporcionada coincide con la contraseña
@@ -81,7 +81,7 @@ public class LoginController {
         } else {
             // Si la contraseña es incorrecta, mostramos un mensaje de error.
             redirectAttributes.addFlashAttribute("error", "Contraseña incorrecta.");
-            return "redirect:/login";
+            return "redirect:GestionTienda/login";
         }
     }
 
@@ -93,6 +93,6 @@ public class LoginController {
         session.invalidate();
         // Añade un mensaje de éxito para mostrar en la página de login.
         redirectAttributes.addFlashAttribute("logout", "Has cerrado sesión exitosamente.");
-        return "redirect:/login";
+        return "redirect:GestionTienda/login";
     }
 }
