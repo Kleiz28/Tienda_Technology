@@ -45,6 +45,7 @@ $(document).ready(function() {
             },
             columns: [
                 { data: 'id' },
+                { data: 'foto' },
                 { data: 'nombre' },
                 { data: 'usuario' },
                 { data: 'perfil.nombre' }, // Nueva columna para el perfil
@@ -138,7 +139,12 @@ $(document).ready(function() {
      */
     function loadProfiles() {
         fetch(ENDPOINTS.profiles)
-            .then(response => response.json())
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Error al cargar perfiles: ' + response.status);
+                }
+                return response.json();
+            })
             .then(data => {
                 if (data.success) {
                     const select = $('#id_perfil');
@@ -147,10 +153,12 @@ $(document).ready(function() {
                         select.append(`<option value="${profile.id}">${profile.nombre}</option>`);
                     });
                 } else {
-                    showNotification('Error al cargar perfiles', 'error');
+                    showNotification('Error al cargar perfiles: ' + (data.message || 'Desconocido'), 'error');
                 }
-            }).catch(error => {
+            })
+            .catch(error => {
                 console.error('Error cargando perfiles:', error);
+                showNotification('Error de conexión al cargar perfiles', 'error');
             });
     }
 
@@ -162,6 +170,7 @@ $(document).ready(function() {
 
         const formData = {
             id: $('#id').val() || null,
+            foto: $('#fotoFile').val(),
             nombre: $('#nombre').val().trim(),
             usuario: $('#usuario').val().trim(),
             clave: $('#clave').val(),
@@ -342,6 +351,7 @@ $(document).ready(function() {
         $('#modalTitle').text('Editar Usuario');
 
         $('#id').val(usuario.id);
+        $('#fotoFile').val(usuario.foto);
         $('#nombre').val(usuario.nombre);
         $('#usuario').val(usuario.usuario);
         $('#correo').val(usuario.correo);

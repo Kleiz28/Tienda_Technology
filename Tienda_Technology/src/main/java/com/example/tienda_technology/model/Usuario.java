@@ -18,6 +18,9 @@ public class Usuario {
     @Column(nullable = false, length = 100)
     private String nombre;
 
+    @Column(length = 255)
+    private String foto;
+
     @NotBlank(message = "El usuario es obligatorio")
     @Size(min = 3, max = 50, message = "El usuario debe tener entre 3 y 50 caracteres")
     @Column(nullable = false, unique = true, length = 50)
@@ -44,11 +47,12 @@ public class Usuario {
     }
 
     // Constructor con parámetros
-    public Usuario(String nombre, String usuario, String clave, String correo) {
+    public Usuario(String nombre, String usuario, String clave, String correo, String foto) {
         this.nombre = nombre;
         this.usuario = usuario;
         this.clave = clave;
         this.correo = correo;
+        this.foto = foto;
         this.estado = 1;
     }
 
@@ -107,6 +111,13 @@ public class Usuario {
 
     public void setPerfil(Perfil perfil) {
         this.perfil = perfil;
+    }
+
+    public String getFoto() {
+        return foto;
+    }
+    public void setFoto(String foto) {
+        this.foto = foto;
     }
 
     @Override
