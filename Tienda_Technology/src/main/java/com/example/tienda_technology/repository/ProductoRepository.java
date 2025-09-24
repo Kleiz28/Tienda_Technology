@@ -1,5 +1,6 @@
 package com.example.tienda_technology.repository;
 
+import com.example.tienda_technology.model.Categoria;
 import com.example.tienda_technology.model.Producto;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -20,8 +21,12 @@ public interface ProductoRepository extends JpaRepository<Producto, Long> {
     // Buscar productos por marca
     List<Producto> findByMarcaContainingIgnoreCaseAndEstado(String marca, Producto.Estado estado);
 
-    // Buscar productos por categoría
-    List<Producto> findByCategoriaContainingIgnoreCaseAndEstado(String categoria, Producto.Estado estado);
+    // Buscar productos por categoría (por ID de categoría)
+    List<Producto> findByCategoriaIdAndEstado(Long categoriaId, Producto.Estado estado);
+
+    // Buscar productos por nombre de categoría (consulta personalizada)
+    @Query("SELECT p FROM Producto p WHERE p.categoria.nombre LIKE %:nombreCategoria% AND p.estado = :estado")
+    List<Producto> findByCategoriaNombreContainingAndEstado(String nombreCategoria, Producto.Estado estado);
 
     // Buscar productos con stock bajo
     @Query("SELECT p FROM Producto p WHERE p.stockActual <= p.stockMinimo AND p.estado = 'ACTIVO'")
@@ -33,4 +38,11 @@ public interface ProductoRepository extends JpaRepository<Producto, Long> {
     // Verificar si existe un producto con el mismo código de barras (excluyendo el actual)
     @Query("SELECT COUNT(p) > 0 FROM Producto p WHERE p.codigoBarras = :codigoBarras AND p.id != :id")
     boolean existsByCodigoBarrasAndIdNot(String codigoBarras, Long id);
+
+    // Contar productos activos por categoría
+    @Query("SELECT COUNT(p) FROM Producto p WHERE p.categoria.id = :categoriaId AND p.estado = 'ACTIVO'")
+    long countByCategoriaIdAndEstadoActivo(Long categoriaId);
+
+    // Buscar productos por categoría (entidad)
+    List<Producto> findByCategoriaAndEstado(Categoria categoria, Producto.Estado estado);
 }

@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Gestión de Categorías</title>
+  <!-- Bootstrap 5 CSS -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <!-- DataTables con integración Bootstrap 5 -->
+  <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.13.6/css/dataTables.bootstrap5.min.css">
+  <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/responsive/2.5.0/css/responsive.bootstrap5.min.css">
+  <!-- Google Font -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- Estilos personalizados -->
+  <link th:href="@{/css/main.css}" rel="stylesheet">
+  <style>
+    .categoria-inactiva {
+      opacity: 0.6;
+    }
+    .stats-card {
+      transition: transform 0.2s;
+    }
+    .stats-card:hover {
+      transform: translateY(-2px);
+    }
+  </style>
+</head>
+<body>
+
+<div class="d-flex">
+  <!-- Sidebar -->
+  <div th:replace="~{GestionTienda/sidebar :: sidebar(activeUri='/categorias')}"></div>
+
+  <!-- Main content -->
+  <main id="main-content" class="main-content w-100">
+    <!-- Top bar -->
+    <header class="p-3 mb-3 border-bottom bg-white shadow-sm">
+      <div class="d-flex align-items-center">
+        <button id="open-sidebar" class="btn btn-light d-md-none me-3 p-1">
+          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" class="bi bi-list" viewBox="0 0 16 16"><path fill-rule="evenodd" d="M2.5 12a.5.5 0 0 1 .5-.5h10a.5.5 0 0 1 0 1H3a.5.5 0 0 1-.5-.5m0-4a.5.5 0 0 1 .5-.5h10a.5.5 0 0 1 0 1H3a.5.5 0 0 1-.5-.5m0-4a.5.5 0 0 1 .5-.5h10a.5.5 0 0 1 0 1H3a.5.5 0 0 1-.5-.5"/></svg>
+        </button>
+        <h1 class="h3 mb-0 fw-bold">Gestión de Categorías</h1>
+        <button id="btnNuevoRegistro" class="btn btn-primary ms-auto">
+          Nueva Categoría
+        </button>
+      </div>
+    </header>
+
+    <!-- Estadísticas -->
+    <div class="container-fluid p-4">
+      <div class="row mb-4">
+        <div class="col-md-6">
+          <div class="card stats-card bg-primary text-white shadow-sm">
+            <div class="card-body">
+              <div class="d-flex justify-content-between">
+                <div>
+                  <h5 class="card-title">Categorías Activas</h5>
+                  <h2 id="totalActivas" class="mb-0">0</h2>
+                </div>
+                <div class="align-self-center">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" fill="currentColor" class="bi bi-tags" viewBox="0 0 16 16">
+                    <path d="M3 2v4.586l7 7L14.586 9l-7-7H3zM2 2a1 1 0 0 1 1-1h4.586a1 1 0 0 1 .707.293l7 7a1 1 0 0 1 0 1.414l-4.586 4.586a1 1 0 0 1-1.414 0l-7-7A1 1 0 0 1 2 6.586V2z"/>
+                    <path d="M5.5 5a.5.5 0 1 1 0-1 .5.5 0 0 1 0 1zm0 1a1.5 1.5 0 1 0 0-3 1.5 1.5 0 0 0 0 3zM1 7.086a1 1 0 0 0 .293.707L8.75 15.25l-.043.043a1 1 0 0 1-1.414 0l-7-7A1 1 0 0 1 0 7.586V3a1 1 0 0 1 1-1v5.086z"/>
+                  </svg>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="col-md-6">
+          <div class="card stats-card bg-success text-white shadow-sm">
+            <div class="card-body">
+              <div class="d-flex justify-content-between">
+                <div>
+                  <h5 class="card-title">Con Productos</h5>
+                  <h2 id="totalConProductos" class="mb-0">0</h2>
+                </div>
+                <div class="align-self-center">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" fill="currentColor" class="bi bi-box-seam" viewBox="0 0 16 16">
+                    <path d="M8.186 1.113a.5.5 0 0 0-.372 0L1.846 3.5l2.404.961L10.404 2l-2.218-.887zm3.564 1.426L5.596 5 8 5.961 14.154 3.5l-2.404-.961zm3.25 1.7-6.5 2.6v7.922l6.5-2.6V4.24zM7.5 14.762V6.838L1 4.239v7.923l6.5 2.6zM7.443.184a1.5 1.5 0 0 1 1.114 0l7.129 2.852A.5.5 0 0 1 16 3.5v8.662a1 1 0 0 1-.629.928l-7.185 2.874a.5.5 0 0 1-.372 0L.63 13.09a1 1 0 0 1-.63-.928V3.5a.5.5 0 0 1 .314-.464L7.443.184z"/>
+                  </svg>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Filtros -->
+      <div class="card shadow-sm rounded-lg mb-4">
+        <div class="card-body">
+          <h5 class="card-title">Filtros de Búsqueda</h5>
+          <div class="row g-3">
+            <div class="col-md-8">
+              <input type="text" id="filtroNombre" class="form-control" placeholder="Buscar categorías por nombre...">
+            </div>
+            <div class="col-md-4">
+              <button id="btnBuscar" class="btn btn-outline-primary w-100">Buscar</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Tabla de Datos Dinámica -->
+      <div class="card shadow-sm rounded-lg">
+        <div class="card-body">
+          <h2 class="card-title h5 mb-4 fw-bold">Lista de Categorías</h2>
+          <table id="tablaCategorias" class="table table-hover responsive" style="width:100%">
+            <thead>
+            <tr>
+              <th>ID</th>
+              <th>Nombre</th>
+              <th>Descripción</th>
+              <th>Productos Activos</th>
+              <th>Estado</th>
+              <th>Acciones</th>
+            </tr>
+            </thead>
+            <tbody>
+            <!-- Los datos serán cargados dinámicamente por DataTables -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </main>
+</div>
+
+<!-- Modal Formulario para Categoría -->
+<div class="modal fade" id="categoriaModal" tabindex="-1" aria-labelledby="modalTitle" aria-hidden="true">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="modalTitle">Agregar Categoría</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <form id="formCategoria" novalidate>
+          <input type="hidden" id="id" name="id">
+          <div class="row">
+            <div class="col-md-6">
+              <div class="mb-3">
+                <label for="nombre" class="form-label">Nombre de la Categoría *</label>
+                <input type="text" id="nombre" name="nombre" class="form-control" required maxlength="100">
+                <div id="nombre-error" class="invalid-feedback d-block"></div>
+              </div>
+            </div>
+            <div class="col-md-6">
+              <div class="mb-3">
+                <label for="estado" class="form-label">Estado</label>
+                <select id="estado" name="estado" class="form-select">
+                  <option value="ACTIVO">Activo</option>
+                  <option value="INACTIVO">Inactivo</option>
+                </select>
+                <div id="estado-error" class="invalid-feedback d-block"></div>
+              </div>
+            </div>
+          </div>
+          <div class="mb-3">
+            <label for="descripcion" class="form-label">Descripción</label>
+            <textarea id="descripcion" name="descripcion" class="form-control" rows="3" maxlength="500"></textarea>
+            <div id="descripcion-error" class="invalid-feedback d-block"></div>
+          </div>
+          <div id="infoProductos" class="alert alert-info d-none">
+            <small>Esta categoría tiene <span id="cantidadProductos">0</span> productos activos asociados.</small>
+          </div>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+        <button type="submit" form="formCategoria" class="btn btn-primary">Guardar Categoría</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Contenedor para notificaciones Toast -->
+<div id="notification-container" class="toast-container position-fixed top-0 end-0 p-3"></div>
+
+<!-- Scripts -->
+<script src="https://code.jquery.com/jquery-3.7.0.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script type="text/javascript" src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
+<script type="text/javascript" src="https://cdn.datatables.net/1.13.6/js/dataTables.bootstrap5.min.js"></script>
+<script type="text/javascript" src="https://cdn.datatables.net/responsive/2.5.0/js/dataTables.responsive.min.js"></script>
+<script type="text/javascript" src="https://cdn.datatables.net/responsive/2.5.0/js/responsive.bootstrap5.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+<script th:src="@{/js/categorias.js}"></script>
+<script th:src="@{/js/main.js}"></script> <!-- Script común para sidebar -->
+
+</body>
+</html>

@@ -1,82 +1,41 @@
 /**
- * Script para la gestión de productos
- * Archivo: src/main/resources/static/js/productos.js
+ * Script para la gestión de categorías
+ * Archivo: src/main/resources/static/js/categorias.js
  */
 
 $(document).ready(function() {
     // Variables globales
     let dataTable;
     let isEditing = false;
-    let productoModal;
-    let categorias = []; // Array para almacenar las categorías
+    let categoriaModal;
 
     // Configuración inicial
-    const API_BASE = '/productos/api';
-    const CATEGORIAS_API = '/categorias/api/activas'; // Nueva API para categorías
+    const API_BASE = '/categorias/api';
     const ENDPOINTS = {
         list: `${API_BASE}/listar`,
-        activos: `${API_BASE}/activos`,
-        stockBajo: `${API_BASE}/stock-bajo`,
+        activas: `${API_BASE}/activas`,
+        conProductos: `${API_BASE}/con-productos`,
         save: `${API_BASE}/guardar`,
         get: (id) => `${API_BASE}/${id}`,
         cambiarEstado: (id, estado) => `${API_BASE}/cambiar-estado/${id}?estado=${estado}`,
         delete: (id) => `${API_BASE}/eliminar/${id}`,
-        buscar: (tipo, valor) => `${API_BASE}/buscar?tipo=${tipo}&valor=${encodeURIComponent(valor)}`
+        buscar: (nombre) => `${API_BASE}/buscar?nombre=${encodeURIComponent(nombre)}`,
+        estadisticas: `${API_BASE}/estadisticas`
     };
 
     // Inicializar Componentes
     initializeDataTable();
-    productoModal = new bootstrap.Modal(document.getElementById('productoModal'));
-    cargarCategorias(); // Cargar categorías al iniciar
+    categoriaModal = new bootstrap.Modal(document.getElementById('categoriaModal'));
+    cargarEstadisticas();
 
     // Event Listeners
     setupEventListeners();
 
     /**
-     * Carga las categorías activas desde el servidor
-     */
-    function cargarCategorias() {
-        fetch(CATEGORIAS_API)
-            .then(response => response.json())
-            .then(result => {
-                if (result.success) {
-                    categorias = result.data;
-                    actualizarSelectorCategorias();
-                } else {
-                    console.error('Error al cargar categorías:', result.message);
-                }
-            })
-            .catch(error => {
-                console.error('Error al cargar categorías:', error);
-                showNotification('Error', 'No se pudieron cargar las categorías', 'error');
-            });
-    }
-
-    /**
-     * Actualiza el selector de categorías con las categorías cargadas
-     */
-    function actualizarSelectorCategorias() {
-        const select = document.getElementById('categoria');
-
-        // Limpiar opciones excepto la primera
-        while (select.options.length > 1) {
-            select.remove(1);
-        }
-
-        // Agregar categorías al selector
-        categorias.forEach(categoria => {
-            const option = document.createElement('option');
-            option.value = categoria.id;
-            option.textContent = categoria.nombre;
-            select.appendChild(option);
-        });
-    }
-
-    /**
      * Inicializa DataTable
      */
     function initializeDataTable() {
-        dataTable = $('#tablaProductos').DataTable({
+        dataTable = $('#tablaCategorias').DataTable({
             responsive: true,
             processing: true,
             ajax: {
@@ -84,30 +43,15 @@ $(document).ready(function() {
                 dataSrc: 'data'
             },
             columns: [
-                {
-                    data: 'fotoUrl',
-                    render: (data) => data ?
-                        `<img src="${data}" class="img-producto" alt="Foto producto" onerror="this.src='data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNTAiIGhlaWdodD0iNTAiIHZpZXdCb3g9IjAgMCA1MCA1MCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHJlY3Qgd2lkdGg9IjUwIiBoZWlnaHQ9IjUwIiBmaWxsPSIjZGRkIi8+Cjx0ZXh0IHg9IjI1IiB5PSIyNSIgZm9udC1mYW1pbHk9IkFyaWFsIiBmb250LXNpemU9IjE0IiBmaWxsPSIjOTk5IiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBkeT0iLjNlbSI+Tm8gaW1hZ2VuPC90ZXh0Pgo8L3N2Zz4K'">` :
-                        '<div class="img-producto bg-light d-flex align-items-center justify-content-center"><small>Sin foto</small></div>'
-                },
                 { data: 'id' },
                 { data: 'nombre' },
-                { data: 'marca' },
                 {
-                    data: 'categoria',
-                    render: (data) => data || '<span class="text-muted">Sin categoría</span>'
+                    data: 'descripcion',
+                    render: (data) => data || '<span class="text-muted">Sin descripción</span>'
                 },
                 {
-                    data: null,
-                    render: (data) => {
-                        const stockBajo = data.stockActual <= data.stockMinimo;
-                        const claseStock = stockBajo ? 'text-danger fw-bold' : '';
-                        return `<span class="${claseStock}">${data.stockActual} / ${data.stockMinimo}</span>`;
-                    }
-                },
-                {
-                    data: 'precioUnitario',
-                    render: (data) => `$${parseFloat(data).toFixed(2)}`
+                    data: 'cantidadProductos',
+                    render: (data) => `<span class="badge bg-primary">${data} productos</span>`
                 },
                 {
                     data: 'estado',
@@ -128,16 +72,13 @@ $(document).ready(function() {
                 }
             ],
             createdRow: function(row, data, dataIndex) {
-                if (data.stockActual <= data.stockMinimo) {
-                    $(row).addClass('stock-bajo');
-                }
                 if (data.estado === 'INACTIVO' || data.estado === 'ELIMINADO') {
-                    $(row).addClass('producto-inactivo');
+                    $(row).addClass('categoria-inactiva');
                 }
             },
             columnDefs: [
-                { responsivePriority: 1, targets: 2 },
-                { responsivePriority: 2, targets: 8 },
+                { responsivePriority: 1, targets: 1 },
+                { responsivePriority: 2, targets: 5 },
             ],
             language: { url: "//cdn.datatables.net/plug-ins/1.13.6/i18n/es-ES.json" },
             pageLength: 10
@@ -151,7 +92,7 @@ $(document).ready(function() {
         const puedeEditar = row.estado === 'ACTIVO' || row.estado === 'INACTIVO';
         const puedeActivar = row.estado === 'INACTIVO';
         const puedeInactivar = row.estado === 'ACTIVO';
-        const puedeEliminar = row.estado !== 'ELIMINADO';
+        const puedeEliminar = row.estado !== 'ELIMINADO' && row.cantidadProductosActivos === 0;
 
         return `
             <div class="d-flex gap-1">
@@ -198,72 +139,57 @@ $(document).ready(function() {
      * Configura los event listeners
      */
     function setupEventListeners() {
-        // Botón nuevo producto
+        // Botón nueva categoría
         $('#btnNuevoRegistro').click(openCreateModal);
 
         // Botón buscar
         $('#btnBuscar').click(handleSearch);
 
         // Enter en campo de búsqueda
-        $('#filtroValor').keypress(function(e) {
+        $('#filtroNombre').keypress(function(e) {
             if (e.which === 13) {
                 handleSearch();
             }
         });
 
-        // Cambio en tipo de filtro
-        $('#filtroTipo').change(function() {
-            const tipo = $(this).val();
-            if (tipo === 'STOCK_BAJO') {
-                $('#filtroValor').prop('disabled', true).val('');
-            } else {
-                $('#filtroValor').prop('disabled', false);
-            }
-        });
-
         // Delegación de eventos para los botones de acción
-        $('#tablaProductos tbody').on('click', '.action-edit', function() {
+        $('#tablaCategorias tbody').on('click', '.action-edit', function() {
             const id = $(this).data('id');
             openEditModal(id);
         });
 
-        $('#tablaProductos tbody').on('click', '.action-activate', function() {
+        $('#tablaCategorias tbody').on('click', '.action-activate', function() {
             const id = $(this).data('id');
-            cambiarEstadoProducto(id, 'ACTIVO');
+            cambiarEstadoCategoria(id, 'ACTIVO');
         });
 
-        $('#tablaProductos tbody').on('click', '.action-inactivate', function() {
+        $('#tablaCategorias tbody').on('click', '.action-inactivate', function() {
             const id = $(this).data('id');
-            cambiarEstadoProducto(id, 'INACTIVO');
+            cambiarEstadoCategoria(id, 'INACTIVO');
         });
 
-        $('#tablaProductos tbody').on('click', '.action-delete', function() {
+        $('#tablaCategorias tbody').on('click', '.action-delete', function() {
             const id = $(this).data('id');
-            eliminarProducto(id);
+            eliminarCategoria(id);
         });
 
         // Envío del formulario
-        $('#formProducto').submit(handleFormSubmit);
+        $('#formCategoria').submit(handleFormSubmit);
 
         // Validación en tiempo real
         setupFormValidation();
-
-        // Validar categoría al cambiar selección
-        $('#categoria').change(function() {
-            validateField(this);
-        });
     }
 
     /**
      * Configura la validación del formulario
      */
     function setupFormValidation() {
-        const form = document.getElementById('formProducto');
+        const form = document.getElementById('formCategoria');
 
-        // Validación en tiempo real para campos requeridos
-        form.querySelectorAll('input[required], select[required]').forEach(field => {
-            field.addEventListener('blur', () => validateField(field));
-            field.addEventListener('input', () => clearFieldError(field));
+        // Validación en tiempo real
+        form.querySelectorAll('input[required]').forEach(input => {
+            input.addEventListener('blur', () => validateField(input));
+            input.addEventListener('input', () => clearFieldError(input));
         });
     }
 
@@ -279,22 +205,8 @@ $(document).ready(function() {
             return false;
         }
 
-        // Validación específica para categoría
-        if (field.id === 'categoria' && !value) {
-            showFieldError(field, 'Debe seleccionar una categoría');
-            return false;
-        }
-
-        if (field.type === 'number') {
-            const min = field.getAttribute('min');
-            if (min !== null && parseFloat(value) < parseFloat(min)) {
-                showFieldError(field, `El valor debe ser mayor o igual a ${min}`);
-                return false;
-            }
-        }
-
-        if (field.type === 'url' && value && !isValidUrl(value)) {
-            showFieldError(field, 'Ingrese una URL válida');
+        if (field.id === 'nombre' && value.length > 100) {
+            showFieldError(field, 'El nombre no puede tener más de 100 caracteres');
             return false;
         }
 
@@ -308,9 +220,7 @@ $(document).ready(function() {
     function showFieldError(field, message) {
         field.classList.add('is-invalid');
         const errorElement = document.getElementById(`${field.id}-error`);
-        if (errorElement) {
-            errorElement.textContent = message;
-        }
+        errorElement.textContent = message;
     }
 
     /**
@@ -319,21 +229,7 @@ $(document).ready(function() {
     function clearFieldError(field) {
         field.classList.remove('is-invalid');
         const errorElement = document.getElementById(`${field.id}-error`);
-        if (errorElement) {
-            errorElement.textContent = '';
-        }
-    }
-
-    /**
-     * Valida si una URL es válida
-     */
-    function isValidUrl(string) {
-        try {
-            new URL(string);
-            return true;
-        } catch (_) {
-            return false;
-        }
+        errorElement.textContent = '';
     }
 
     /**
@@ -341,112 +237,74 @@ $(document).ready(function() {
      */
     function validateForm() {
         let isValid = true;
-        const form = document.getElementById('formProducto');
+        const form = document.getElementById('formCategoria');
 
-        form.querySelectorAll('input[required], select[required]').forEach(field => {
+        form.querySelectorAll('input[required]').forEach(field => {
             if (!validateField(field)) {
                 isValid = false;
             }
         });
 
-        // Validación adicional: stock mínimo debe ser mayor a 0
-        const stockMinimo = document.getElementById('stockMinimo');
-        if (stockMinimo.value && parseInt(stockMinimo.value) <= 0) {
-            showFieldError(stockMinimo, 'El stock mínimo debe ser mayor a 0');
-            isValid = false;
-        }
-
-        // Validación adicional: precio unitario debe ser mayor a precio de coste
-        const precioUnitario = parseFloat(document.getElementById('precioUnitario').value);
-        const precioCoste = parseFloat(document.getElementById('precioCoste').value);
-        if (precioUnitario && precioCoste && precioUnitario <= precioCoste) {
-            showFieldError(document.getElementById('precioUnitario'), 'El precio unitario debe ser mayor al precio de coste');
-            isValid = false;
-        }
-
         return isValid;
     }
 
     /**
-     * Abre modal para crear nuevo producto
+     * Abre modal para crear nueva categoría
      */
     function openCreateModal() {
         isEditing = false;
         resetForm();
-        document.getElementById('modalTitle').textContent = 'Agregar Producto';
-
-        // Asegurarse de que las categorías estén cargadas
-        if (categorias.length === 0) {
-            cargarCategorias();
-        }
-
-        productoModal.show();
+        document.getElementById('modalTitle').textContent = 'Agregar Categoría';
+        document.getElementById('infoProductos').classList.add('d-none');
+        categoriaModal.show();
     }
 
     /**
-     * Abre modal para editar producto
+     * Abre modal para editar categoría
      */
     function openEditModal(id) {
         isEditing = true;
         resetForm();
-        document.getElementById('modalTitle').textContent = 'Editar Producto';
+        document.getElementById('modalTitle').textContent = 'Editar Categoría';
 
         fetch(ENDPOINTS.get(id))
             .then(response => response.json())
             .then(result => {
                 if (result.success) {
-                    // Asegurarse de que las categorías estén cargadas antes de poblar el formulario
-                    if (categorias.length === 0) {
-                        cargarCategorias().then(() => {
-                            populateForm(result.data);
-                        });
-                    } else {
-                        populateForm(result.data);
+                    populateForm(result.data);
+                    // Mostrar información de productos si tiene
+                    if (result.cantidadProductos > 0) {
+                        document.getElementById('cantidadProductos').textContent = result.cantidadProductos;
+                        document.getElementById('infoProductos').classList.remove('d-none');
                     }
-                    productoModal.show();
+                    categoriaModal.show();
                 } else {
                     showNotification('Error', result.message, 'error');
                 }
             })
             .catch(error => {
-                showNotification('Error', 'Error al cargar el producto', 'error');
+                showNotification('Error', 'Error al cargar la categoría', 'error');
                 console.error('Error:', error);
             });
     }
 
     /**
-     * Llena el formulario con datos del producto
+     * Llena el formulario con datos de la categoría
      */
-    function populateForm(producto) {
-        document.getElementById('id').value = producto.id || '';
-        document.getElementById('nombre').value = producto.nombre || '';
-        document.getElementById('marca').value = producto.marca || '';
-        document.getElementById('codigoBarras').value = producto.codigoBarras || '';
-        document.getElementById('fotoUrl').value = producto.fotoUrl || '';
-        document.getElementById('stockActual').value = producto.stockActual || 0;
-        document.getElementById('stockMinimo').value = producto.stockMinimo || 5;
-        document.getElementById('precioUnitario').value = producto.precioUnitario || '';
-        document.getElementById('precioCoste').value = producto.precioCoste || '';
-        document.getElementById('descripcion').value = producto.descripcion || '';
-
-        // Manejar la categoría (puede ser objeto o ID)
-        if (producto.categoria) {
-            if (typeof producto.categoria === 'object' && producto.categoria.id) {
-                document.getElementById('categoria').value = producto.categoria.id;
-            } else if (typeof producto.categoria === 'string') {
-                document.getElementById('categoria').value = producto.categoria;
-            } else if (typeof producto.categoria === 'number') {
-                document.getElementById('categoria').value = producto.categoria.toString();
-            }
-        }
+    function populateForm(categoria) {
+        document.getElementById('id').value = categoria.id;
+        document.getElementById('nombre').value = categoria.nombre || '';
+        document.getElementById('descripcion').value = categoria.descripcion || '';
+        document.getElementById('estado').value = categoria.estado || 'ACTIVO';
     }
 
     /**
      * Resetea el formulario
      */
     function resetForm() {
-        document.getElementById('formProducto').reset();
+        document.getElementById('formCategoria').reset();
         document.getElementById('id').value = '';
+        document.getElementById('estado').value = 'ACTIVO';
 
         // Limpiar errores
         document.querySelectorAll('.is-invalid').forEach(field => {
@@ -480,65 +338,52 @@ $(document).ready(function() {
             .then(response => response.json())
             .then(result => {
                 if (result.success) {
-                    productoModal.hide();
+                    categoriaModal.hide();
                     showNotification('Éxito', result.message, 'success');
                     dataTable.ajax.reload();
+                    cargarEstadisticas();
                 } else {
                     showNotification('Error', result.message, 'error');
                 }
             })
             .catch(error => {
-                showNotification('Error', 'Error al guardar el producto', 'error');
+                showNotification('Error', 'Error al guardar la categoría', 'error');
                 console.error('Error:', error);
             });
     }
 
     /**
-     * Obtiene los datos del formulario con estructura correcta para categoría
+     * Obtiene los datos del formulario
      */
     function getFormData() {
-        const categoriaId = document.getElementById('categoria').value;
-
         return {
             id: document.getElementById('id').value || null,
             nombre: document.getElementById('nombre').value,
-            marca: document.getElementById('marca').value,
-            categoria: {
-                id: categoriaId ? parseInt(categoriaId) : null
-            },
-            codigoBarras: document.getElementById('codigoBarras').value,
-            fotoUrl: document.getElementById('fotoUrl').value,
-            stockActual: parseInt(document.getElementById('stockActual').value),
-            stockMinimo: parseInt(document.getElementById('stockMinimo').value),
-            precioUnitario: parseFloat(document.getElementById('precioUnitario').value),
-            precioCoste: parseFloat(document.getElementById('precioCoste').value),
-            descripcion: document.getElementById('descripcion').value
+            descripcion: document.getElementById('descripcion').value,
+            estado: document.getElementById('estado').value
         };
     }
 
     /**
-     * Maneja la búsqueda de productos
+     * Maneja la búsqueda de categorías
      */
     function handleSearch() {
-        const tipo = $('#filtroTipo').val();
-        const valor = $('#filtroValor').val().trim();
+        const nombre = $('#filtroNombre').val().trim();
 
         let url;
-        if (tipo === 'STOCK_BAJO') {
-            url = ENDPOINTS.stockBajo;
-        } else if (tipo === 'TODOS' || !valor) {
-            url = ENDPOINTS.activos;
+        if (!nombre) {
+            url = ENDPOINTS.list;
         } else {
-            url = ENDPOINTS.buscar(tipo, valor);
+            url = ENDPOINTS.buscar(nombre);
         }
 
         dataTable.ajax.url(url).load();
     }
 
     /**
-     * Cambia el estado de un producto
+     * Cambia el estado de una categoría
      */
-    function cambiarEstadoProducto(id, nuevoEstado) {
+    function cambiarEstadoCategoria(id, nuevoEstado) {
         const acciones = {
             'ACTIVO': 'activar',
             'INACTIVO': 'inactivar',
@@ -549,7 +394,7 @@ $(document).ready(function() {
 
         Swal.fire({
             title: `¿Está seguro?`,
-            text: `¿Desea ${accion} este producto?`,
+            text: `¿Desea ${accion} esta categoría?`,
             icon: 'warning',
             showCancelButton: true,
             confirmButtonColor: '#3085d6',
@@ -566,12 +411,13 @@ $(document).ready(function() {
                         if (result.success) {
                             showNotification('Éxito', result.message, 'success');
                             dataTable.ajax.reload();
+                            cargarEstadisticas();
                         } else {
                             showNotification('Error', result.message, 'error');
                         }
                     })
                     .catch(error => {
-                        showNotification('Error', `Error al ${accion} el producto`, 'error');
+                        showNotification('Error', `Error al ${accion} la categoría`, 'error');
                         console.error('Error:', error);
                     });
             }
@@ -579,10 +425,27 @@ $(document).ready(function() {
     }
 
     /**
-     * Elimina un producto (cambia estado a ELIMINADO)
+     * Elimina una categoría (cambia estado a ELIMINADO)
      */
-    function eliminarProducto(id) {
-        cambiarEstadoProducto(id, 'ELIMINADO');
+    function eliminarCategoria(id) {
+        cambiarEstadoCategoria(id, 'ELIMINADO');
+    }
+
+    /**
+     * Carga las estadísticas
+     */
+    function cargarEstadisticas() {
+        fetch(ENDPOINTS.estadisticas)
+            .then(response => response.json())
+            .then(result => {
+                if (result.success) {
+                    $('#totalActivas').text(result.totalActivas);
+                    $('#totalConProductos').text(result.totalConProductos);
+                }
+            })
+            .catch(error => {
+                console.error('Error al cargar estadísticas:', error);
+            });
     }
 
     /**
@@ -618,7 +481,4 @@ $(document).ready(function() {
             toastElement.remove();
         });
     }
-
-    // Inicializar el campo de búsqueda según el tipo seleccionado
-    $('#filtroTipo').trigger('change');
 });

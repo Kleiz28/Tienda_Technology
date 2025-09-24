@@ -90,7 +90,20 @@ public class ProductoServiceImpl implements ProductoService {
     @Override
     @Transactional(readOnly = true)
     public List<Producto> buscarPorCategoria(String categoria) {
-        return productoRepository.findByCategoriaContainingIgnoreCaseAndEstado(categoria, Producto.Estado.ACTIVO);
+        // Buscar por nombre de categoría
+        return productoRepository.findByCategoriaNombreContainingAndEstado(categoria, Producto.Estado.ACTIVO);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<Producto> buscarPorCategoriaId(Long categoriaId) {
+        return productoRepository.findByCategoriaIdAndEstado(categoriaId, Producto.Estado.ACTIVO);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public long contarProductosActivosPorCategoriaId(Long categoriaId) {
+        return productoRepository.countByCategoriaIdAndEstadoActivo(categoriaId);
     }
 
     @Override

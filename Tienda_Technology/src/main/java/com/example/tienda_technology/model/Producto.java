@@ -1,6 +1,7 @@
 package com.example.tienda_technology.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 
 import java.math.BigDecimal;
@@ -40,8 +41,10 @@ public class Producto {
     @Column(name = "codigo_barras", unique = true, length = 50)
     private String codigoBarras;
 
-    @Column(name = "categoria", length = 50)
-    private String categoria;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "categoria_id")
+    @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
+    private Categoria categoria;
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false, length = 20)
@@ -59,11 +62,12 @@ public class Producto {
     }
 
     // Constructor con parámetros principales
-    public Producto(String nombre, String marca, BigDecimal precioUnitario) {
+    public Producto(String nombre, String marca, BigDecimal precioUnitario, Categoria categoria) {
         this.nombre = nombre;
         this.marca = marca;
         this.precioUnitario = precioUnitario;
         this.precioCoste = precioUnitario.multiply(new BigDecimal("0.8")); // 80% del precio unitario
+        this.categoria = categoria;
     }
 
     // Getters y Setters
@@ -147,11 +151,11 @@ public class Producto {
         this.codigoBarras = codigoBarras;
     }
 
-    public String getCategoria() {
+    public Categoria getCategoria() {
         return categoria;
     }
 
-    public void setCategoria(String categoria) {
+    public void setCategoria(Categoria categoria) {
         this.categoria = categoria;
     }
 
@@ -161,6 +165,12 @@ public class Producto {
 
     public void setEstado(Estado estado) {
         this.estado = estado;
+    }
+
+    // Método para obtener el nombre de la categoría (para compatibilidad)
+    @JsonIgnore
+    public String getNombreCategoria() {
+        return categoria != null ? categoria.getNombre() : null;
     }
 
     // Método para verificar si el stock está bajo
@@ -184,6 +194,7 @@ public class Producto {
                 "id=" + id +
                 ", nombre='" + nombre + '\'' +
                 ", marca='" + marca + '\'' +
+                ", categoria=" + (categoria != null ? categoria.getNombre() : "null") +
                 ", stockActual=" + stockActual +
                 ", precioUnitario=" + precioUnitario +
                 ", estado=" + estado +

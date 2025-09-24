@@ -29,6 +29,9 @@
             object-fit: cover;
             border-radius: 4px;
         }
+        .select2-container--bootstrap-5 {
+            width: 100% !important;
+        }
     </style>
 </head>
 <body>
@@ -129,8 +132,11 @@
                                 <div id="marca-error" class="invalid-feedback d-block"></div>
                             </div>
                             <div class="mb-3">
-                                <label for="categoria" class="form-label">Categoría</label>
-                                <input type="text" id="categoria" name="categoria" class="form-control">
+                                <label for="categoria" class="form-label">Categoría *</label>
+                                <select id="categoria" name="categoria" class="form-select" required>
+                                    <option value="">Seleccione una categoría</option>
+                                    <!-- Las opciones se cargarán dinámicamente -->
+                                </select>
                                 <div id="categoria-error" class="invalid-feedback d-block"></div>
                             </div>
                             <div class="mb-3">

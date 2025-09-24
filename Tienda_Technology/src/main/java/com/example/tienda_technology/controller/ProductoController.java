@@ -1,5 +1,6 @@
 package com.example.tienda_technology.controller;
 
+import com.example.tienda_technology.dto.ProductoDTO;
 import com.example.tienda_technology.model.Producto;
 import com.example.tienda_technology.service.ProductoService;
 import org.springframework.http.HttpStatus;
@@ -8,7 +9,9 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 @Controller
 @RequestMapping("/productos")
@@ -30,8 +33,13 @@ public class ProductoController {
     public ResponseEntity<?> listarProductosApi() {
         Map<String, Object> response = new HashMap<>();
         try {
+            List<Producto> productos = productoService.listarTodosLosProductos();
+            List<ProductoDTO> productoDTOs = productos.stream()
+                    .map(ProductoDTO::new)
+                    .collect(Collectors.toList());
+
             response.put("success", true);
-            response.put("data", productoService.listarTodosLosProductos());
+            response.put("data", productoDTOs);
             return ResponseEntity.ok(response);
         } catch (Exception e) {
             response.put("success", false);
@@ -45,8 +53,13 @@ public class ProductoController {
     public ResponseEntity<?> listarProductosActivosApi() {
         Map<String, Object> response = new HashMap<>();
         try {
+            List<Producto> productos = productoService.listarProductosActivos();
+            List<ProductoDTO> productoDTOs = productos.stream()
+                    .map(ProductoDTO::new)
+                    .collect(Collectors.toList());
+
             response.put("success", true);
-            response.put("data", productoService.listarProductosActivos());
+            response.put("data", productoDTOs);
             return ResponseEntity.ok(response);
         } catch (Exception e) {
             response.put("success", false);
@@ -60,8 +73,13 @@ public class ProductoController {
     public ResponseEntity<?> listarProductosStockBajoApi() {
         Map<String, Object> response = new HashMap<>();
         try {
+            List<Producto> productos = productoService.listarProductosConStockBajo();
+            List<ProductoDTO> productoDTOs = productos.stream()
+                    .map(ProductoDTO::new)
+                    .collect(Collectors.toList());
+
             response.put("success", true);
-            response.put("data", productoService.listarProductosConStockBajo());
+            response.put("data", productoDTOs);
             return ResponseEntity.ok(response);
         } catch (Exception e) {
             response.put("success", false);
@@ -76,8 +94,9 @@ public class ProductoController {
         Map<String, Object> response = new HashMap<>();
         return productoService.obtenerProductoPorId(id)
                 .map(producto -> {
+                    ProductoDTO productoDTO = new ProductoDTO(producto);
                     response.put("success", true);
-                    response.put("data", producto);
+                    response.put("data", productoDTO);
                     return ResponseEntity.ok(response);
                 })
                 .orElseGet(() -> {
@@ -93,14 +112,50 @@ public class ProductoController {
         Map<String, Object> response = new HashMap<>();
         try {
             Producto productoGuardado = productoService.guardarProducto(producto);
+            ProductoDTO productoDTO = new ProductoDTO(productoGuardado);
+
             response.put("success", true);
             response.put("message", producto.getId() != null ? "Producto actualizado" : "Producto creado");
-            response.put("data", productoGuardado);
+            response.put("data", productoDTO);
             return ResponseEntity.ok(response);
         } catch (Exception e) {
             response.put("success", false);
             response.put("message", "Error al guardar el producto: " + e.getMessage());
             return ResponseEntity.badRequest().body(response);
+        }
+    }
+
+    @GetMapping("/api/buscar")
+    @ResponseBody
+    public ResponseEntity<?> buscarProductos(@RequestParam String tipo, @RequestParam String valor) {
+        Map<String, Object> response = new HashMap<>();
+        try {
+            List<Producto> productos;
+            switch (tipo.toUpperCase()) {
+                case "NOMBRE":
+                    productos = productoService.buscarPorNombre(valor);
+                    break;
+                case "MARCA":
+                    productos = productoService.buscarPorMarca(valor);
+                    break;
+                case "CATEGORIA":
+                    productos = productoService.buscarPorCategoria(valor);
+                    break;
+                default:
+                    productos = productoService.listarProductosActivos();
+            }
+
+            List<ProductoDTO> productoDTOs = productos.stream()
+                    .map(ProductoDTO::new)
+                    .collect(Collectors.toList());
+
+            response.put("success", true);
+            response.put("data", productoDTOs);
+            return ResponseEntity.ok(response);
+        } catch (Exception e) {
+            response.put("success", false);
+            response.put("message", "Error en la búsqueda: " + e.getMessage());
+            return ResponseEntity.internalServerError().body(response);
         }
     }
 
@@ -143,30 +198,4 @@ public class ProductoController {
         }
     }
 
-    @GetMapping("/api/buscar")
-    @ResponseBody
-    public ResponseEntity<?> buscarProductos(@RequestParam String tipo, @RequestParam String valor) {
-        Map<String, Object> response = new HashMap<>();
-        try {
-            switch (tipo.toUpperCase()) {
-                case "NOMBRE":
-                    response.put("data", productoService.buscarPorNombre(valor));
-                    break;
-                case "MARCA":
-                    response.put("data", productoService.buscarPorMarca(valor));
-                    break;
-                case "CATEGORIA":
-                    response.put("data", productoService.buscarPorCategoria(valor));
-                    break;
-                default:
-                    response.put("data", productoService.listarProductosActivos());
-            }
-            response.put("success", true);
-            return ResponseEntity.ok(response);
-        } catch (Exception e) {
-            response.put("success", false);
-            response.put("message", "Error en la búsqueda: " + e.getMessage());
-            return ResponseEntity.internalServerError().body(response);
-        }
-    }
 }
