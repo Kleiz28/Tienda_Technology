@@ -21,7 +21,7 @@ $(document).ready(function() {
     };
 
     // Inicializar DataTable
-    initializeDataTable(); 
+    initializeDataTable();
 
     // Inicializar Modal de Bootstrap
     usuarioModal = new bootstrap.Modal(document.getElementById('usuarioModal'));
@@ -173,32 +173,39 @@ $(document).ready(function() {
         // Crear FormData para enviar archivos
         const formData = new FormData();
         const fotoFile = $('#fotoFile')[0].files[0];
+        const eliminarFoto = $('#eliminarFoto').val() === 'true';
 
         // Agregar archivo si existe
         if (fotoFile) {
             formData.append('fotoFile', fotoFile);
         }
 
-        // Datos del usuario como JSON
+        // Agregar flag para eliminar foto si está marcado
+        if (eliminarFoto) {
+            formData.append('eliminarFoto', 'true');
+        }
+
+        // Datos del usuario como JSON (SOLO campos que existen en la entidad Usuario)
         const usuarioData = {
             id: $('#id').val() || null,
             nombre: $('#nombre').val().trim(),
             usuario: $('#usuario').val().trim(),
-            clave: $('#clave').val(),
+            clave: $('#clave').val(), // Puede estar vacío en edición
             correo: $('#correo').val().trim(),
             perfil: {
                 id: $('#id_perfil').val()
             }
+            // NO incluir fotoActual aquí - se maneja separadamente
         };
 
-        // Si es edición y la clave está vacía, no enviarla
-        if (isEditing && !usuarioData.clave) {
-            delete usuarioData.clave;
-        }
-
-        // Validación básica del lado cliente
+        // Validación básica del lado cliente (CORREGIDA para contraseña)
         if (!validateForm(usuarioData)) {
             return;
+        }
+
+        // Si es edición y la clave está vacía, eliminar del objeto para no enviarla
+        if (isEditing && (!usuarioData.clave || usuarioData.clave.trim() === '')) {
+            delete usuarioData.clave;
         }
 
         // Agregar datos del usuario como JSON string
@@ -208,7 +215,7 @@ $(document).ready(function() {
 
         fetch(ENDPOINTS.save, {
             method: 'POST',
-            body: formData // No establecer Content-Type, el navegador lo hará automáticamente
+            body: formData
         })
             .then(response => response.json())
             .then(data => {
@@ -217,7 +224,14 @@ $(document).ready(function() {
                     showNotification(data.message, 'success');
                     loadUsuarios(); // Recargar la tabla
                 } else {
-                    showNotification(data.message, 'error');
+                    if (data.errors) {
+                        // Mostrar errores de validación del servidor
+                        Object.keys(data.errors).forEach(field => {
+                            showFieldError(field, data.errors[field]);
+                        });
+                    } else {
+                        showNotification(data.message, 'error');
+                    }
                 }
             })
             .catch(error => {
@@ -228,6 +242,7 @@ $(document).ready(function() {
                 showLoading(false);
             });
     }
+
 
 // AGREGAR función para previsualizar foto
     function setupPhotoPreview() {
@@ -256,14 +271,51 @@ $(document).ready(function() {
         $('#id_perfil').val(usuario.perfil ? usuario.perfil.id : '');
         $('#clave').val('').prop('required', false).attr('placeholder', 'Dejar en blanco para no cambiar');
 
+        // Campo oculto para controlar eliminación de foto
+        if ($('#eliminarFoto').length === 0) {
+            $('#formUsuario').append('<input type="hidden" id="eliminarFoto" name="eliminarFoto" value="false">');
+        }
+        $('#eliminarFoto').val('false');
+
         // Mostrar foto actual si existe
         if (usuario.foto) {
             $('#fotoPreview').attr('src', '/fotos/' + usuario.foto).show();
+            // Agregar opción para eliminar foto actual
+            addRemovePhotoOption();
         } else {
             $('#fotoPreview').hide();
+            removeRemovePhotoOption();
         }
 
         showModal();
+    }
+
+    function addRemovePhotoOption() {
+        if ($('#removePhotoBtn').length === 0) {
+            const removeBtn = `
+            <button type="button" id="removePhotoBtn" class="btn btn-outline-danger btn-sm mt-2">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-trash" viewBox="0 0 16 16">
+                    <path d="M5.5 5.5A.5.5 0 0 1 6 6v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5zm2.5 0a.5.5 0 0 1 .5.5v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5zm3 .5a.5.5 0 0 0-1 0v6a.5.5 0 0 0 1 0V6z"/>
+                    <path fill-rule="evenodd" d="M14.5 3a1 1 0 0 1-1 1H13v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V4h-.5a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1H6a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1h3.5a1 1 0 0 1 1 1v1zM4.118 4 4 4.059V13a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1V4.059L11.882 4H4.118zM2.5 3V2h11v1h-11z"/>
+                </svg>
+                Eliminar Foto Actual
+            </button>
+        `;
+            $('#fotoPreview').after(removeBtn);
+
+            $('#removePhotoBtn').on('click', function() {
+                // Marcar que se debe eliminar la foto
+                $('#eliminarFoto').val('true');
+                $('#fotoPreview').hide();
+                $('#fotoFile').val('');
+                $(this).remove();
+                showNotification('Foto marcada para eliminar', 'info');
+            });
+        }
+    }
+
+    function removeRemovePhotoOption() {
+        $('#removePhotoBtn').remove();
     }
 
 // MODIFICAR la función openModalForNew()
@@ -463,6 +515,9 @@ $(document).ready(function() {
         $('#formUsuario')[0].reset();
         $('#formUsuario .form-control').removeClass('is-invalid');
         $('.invalid-feedback').text('');
+        $('#fotoPreview').hide();
+        $('#eliminarFoto').remove();
+        removeRemovePhotoOption();
         isEditing = false;
     }
 
@@ -494,12 +549,21 @@ $(document).ready(function() {
             hasErrors = true;
         }
 
-        if (!isEditing && !formData.clave) {
-            showFieldError('clave', 'La contraseña es obligatoria');
-            hasErrors = true;
-        } else if (formData.clave && formData.clave.length < 6) {
-            showFieldError('clave', 'La contraseña debe tener al menos 6 caracteres');
-            hasErrors = true;
+        // VALIDACIÓN CORREGIDA: Solo requerir contraseña para nuevos usuarios
+        if (!isEditing) {
+            if (!formData.clave) {
+                showFieldError('clave', 'La contraseña es obligatoria para nuevos usuarios');
+                hasErrors = true;
+            } else if (formData.clave.length < 6) {
+                showFieldError('clave', 'La contraseña debe tener al menos 6 caracteres');
+                hasErrors = true;
+            }
+        } else {
+            // Para edición: solo validar si se proporciona una nueva contraseña
+            if (formData.clave && formData.clave.length < 6) {
+                showFieldError('clave', 'La contraseña debe tener al menos 6 caracteres');
+                hasErrors = true;
+            }
         }
 
         if (!formData.correo) {

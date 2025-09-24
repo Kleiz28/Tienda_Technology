@@ -9,6 +9,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
+import com.fasterxml.jackson.databind.DeserializationFeature;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -77,13 +78,17 @@ public class UsuarioController {
     @ResponseBody
     public ResponseEntity<?> guardarUsuarioAjax(
             @RequestParam(value = "fotoFile", required = false) MultipartFile fotoFile,
+            @RequestParam(value = "eliminarFoto", required = false) String eliminarFoto,
             @RequestParam("usuario") String usuarioJson) throws IOException {
 
         Map<String, Object> response = new HashMap<>();
 
         try {
-            // Convertir JSON string a objeto Usuario
+            // Configurar ObjectMapper para ignorar propiedades desconocidas
             ObjectMapper objectMapper = new ObjectMapper();
+            objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+
+            // Convertir JSON string a objeto Usuario
             Usuario usuario = objectMapper.readValue(usuarioJson, Usuario.class);
 
             // Validaciones manuales básicas
@@ -105,8 +110,12 @@ public class UsuarioController {
                 return ResponseEntity.badRequest().body(response);
             }
 
-            // Llama al servicio para guardar el usuario con la foto
-            Usuario usuarioGuardado = usuarioService.guardarUsuario(usuario, fotoFile);
+            // Manejar eliminación de foto si se solicita
+            boolean eliminarFotoFlag = "true".equalsIgnoreCase(eliminarFoto);
+
+            // Llama al servicio para guardar el usuario
+            Usuario usuarioGuardado = usuarioService.guardarUsuario(usuario, fotoFile, eliminarFotoFlag);
+
             response.put("success", true);
             response.put("usuario", usuarioGuardado);
             response.put("message", usuario.getId() != null ? "Usuario actualizado correctamente" : "Usuario creado correctamente");
@@ -118,6 +127,7 @@ public class UsuarioController {
             return ResponseEntity.internalServerError().body(response);
         }
     }
+
 
     @GetMapping("/api/{id}")
     // GET /usuarios/api/{id}: Devuelve los datos de un único usuario por su ID.
