@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gestión de Productos</title>
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- DataTables con integración Bootstrap 5 -->
+    <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.13.6/css/dataTables.bootstrap5.min.css">
+    <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/responsive/2.5.0/css/responsive.bootstrap5.min.css">
+    <!-- Google Font -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+    <!-- Estilos personalizados -->
+    <link th:href="@{/css/main.css}" rel="stylesheet">
+    <style>
+        .stock-bajo {
+            background-color: #fff3cd !important;
+        }
+        .producto-inactivo {
+            opacity: 0.6;
+        }
+        .img-producto {
+            width: 50px;
+            height: 50px;
+            object-fit: cover;
+            border-radius: 4px;
+        }
+    </style>
+</head>
+<body>
+
+<div class="d-flex">
+    <!-- Sidebar -->
+    <div th:replace="~{GestionTienda/sidebar :: sidebar(activeUri='/dashboard')}"></div>
+
+    <!-- Main content -->
+    <main id="main-content" class="main-content w-100">
+        <!-- Top bar -->
+        <header class="p-3 mb-3 border-bottom bg-white shadow-sm">
+            <div class="d-flex align-items-center">
+                <button id="open-sidebar" class="btn btn-light d-md-none me-3 p-1">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" class="bi bi-list" viewBox="0 0 16 16"><path fill-rule="evenodd" d="M2.5 12a.5.5 0 0 1 .5-.5h10a.5.5 0 0 1 0 1H3a.5.5 0 0 1-.5-.5m0-4a.5.5 0 0 1 .5-.5h10a.5.5 0 0 1 0 1H3a.5.5 0 0 1-.5-.5m0-4a.5.5 0 0 1 .5-.5h10a.5.5 0 0 1 0 1H3a.5.5 0 0 1-.5-.5"/></svg>
+                </button>
+                <h1 class="h3 mb-0 fw-bold">Gestión de Productos</h1>
+                <button id="btnNuevoRegistro" class="btn btn-primary ms-auto">
+                    Nuevo Producto
+                </button>
+            </div>
+        </header>
+
+        <!-- Filtros -->
+        <div class="container-fluid p-4">
+            <div class="card shadow-sm rounded-lg mb-4">
+                <div class="card-body">
+                    <h5 class="card-title">Filtros de Búsqueda</h5>
+                    <div class="row g-3">
+                        <div class="col-md-3">
+                            <select id="filtroTipo" class="form-select">
+                                <option value="TODOS">Todos los productos</option>
+                                <option value="NOMBRE">Por nombre</option>
+                                <option value="MARCA">Por marca</option>
+                                <option value="CATEGORIA">Por categoría</option>
+                                <option value="STOCK_BAJO">Stock bajo</option>
+                            </select>
+                        </div>
+                        <div class="col-md-6">
+                            <input type="text" id="filtroValor" class="form-control" placeholder="Ingrese valor para buscar...">
+                        </div>
+                        <div class="col-md-3">
+                            <button id="btnBuscar" class="btn btn-outline-primary w-100">Buscar</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tabla de Datos Dinámica -->
+            <div class="card shadow-sm rounded-lg">
+                <div class="card-body">
+                    <h2 class="card-title h5 mb-4 fw-bold">Lista de Productos</h2>
+                    <table id="tablaProductos" class="table table-hover responsive" style="width:100%">
+                        <thead>
+                        <tr>
+                            <th>Foto</th>
+                            <th>ID</th>
+                            <th>Nombre</th>
+                            <th>Marca</th>
+                            <th>Categoría</th>
+                            <th>Stock</th>
+                            <th>Precio Unitario</th>
+                            <th>Estado</th>
+                            <th>Acciones</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <!-- Los datos serán cargados dinámicamente por DataTables -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </main>
+</div>
+
+<!-- Modal Formulario para Producto -->
+<div class="modal fade" id="productoModal" tabindex="-1" aria-labelledby="modalTitle" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="modalTitle">Agregar Producto</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="formProducto" novalidate>
+                    <input type="hidden" id="id" name="id">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="nombre" class="form-label">Nombre del Producto *</label>
+                                <input type="text" id="nombre" name="nombre" class="form-control" required>
+                                <div id="nombre-error" class="invalid-feedback d-block"></div>
+                            </div>
+                            <div class="mb-3">
+                                <label for="marca" class="form-label">Marca</label>
+                                <input type="text" id="marca" name="marca" class="form-control">
+                                <div id="marca-error" class="invalid-feedback d-block"></div>
+                            </div>
+                            <div class="mb-3">
+                                <label for="categoria" class="form-label">Categoría</label>
+                                <input type="text" id="categoria" name="categoria" class="form-control">
+                                <div id="categoria-error" class="invalid-feedback d-block"></div>
+                            </div>
+                            <div class="mb-3">
+                                <label for="codigoBarras" class="form-label">Código de Barras</label>
+                                <input type="text" id="codigoBarras" name="codigoBarras" class="form-control">
+                                <div id="codigoBarras-error" class="invalid-feedback d-block"></div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="fotoUrl" class="form-label">URL de la Foto</label>
+                                <input type="url" id="fotoUrl" name="fotoUrl" class="form-control" placeholder="https://ejemplo.com/foto.jpg">
+                                <div id="fotoUrl-error" class="invalid-feedback d-block"></div>
+                            </div>
+                            <div class="mb-3">
+                                <label for="stockActual" class="form-label">Stock Actual *</label>
+                                <input type="number" id="stockActual" name="stockActual" class="form-control" min="0" required>
+                                <div id="stockActual-error" class="invalid-feedback d-block"></div>
+                            </div>
+                            <div class="mb-3">
+                                <label for="stockMinimo" class="form-label">Stock Mínimo *</label>
+                                <input type="number" id="stockMinimo" name="stockMinimo" class="form-control" min="1" required>
+                                <div id="stockMinimo-error" class="invalid-feedback d-block"></div>
+                            </div>
+                            <div class="mb-3">
+                                <label for="precioUnitario" class="form-label">Precio Unitario *</label>
+                                <input type="number" id="precioUnitario" name="precioUnitario" class="form-control" min="0" step="0.01" required>
+                                <div id="precioUnitario-error" class="invalid-feedback d-block"></div>
+                            </div>
+                            <div class="mb-3">
+                                <label for="precioCoste" class="form-label">Precio de Coste *</label>
+                                <input type="number" id="precioCoste" name="precioCoste" class="form-control" min="0" step="0.01" required>
+                                <div id="precioCoste-error" class="invalid-feedback d-block"></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-12">
+                            <div class="mb-3">
+                                <label for="descripcion" class="form-label">Descripción</label>
+                                <textarea id="descripcion" name="descripcion" class="form-control" rows="3"></textarea>
+                                <div id="descripcion-error" class="invalid-feedback d-block"></div>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                <button type="submit" form="formProducto" class="btn btn-primary">Guardar Producto</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Contenedor para notificaciones Toast -->
+<div id="notification-container" class="toast-container position-fixed top-0 end-0 p-3"></div>
+
+<!-- Scripts -->
+<script src="https://code.jquery.com/jquery-3.7.0.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script type="text/javascript" src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
+<script type="text/javascript" src="https://cdn.datatables.net/1.13.6/js/dataTables.bootstrap5.min.js"></script>
+<script type="text/javascript" src="https://cdn.datatables.net/responsive/2.5.0/js/dataTables.responsive.min.js"></script>
+<script type="text/javascript" src="https://cdn.datatables.net/responsive/2.5.0/js/responsive.bootstrap5.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+<script th:src="@{/js/productos.js}"></script>
+<script th:src="@{/js/main.js}"></script> <!-- Script común para sidebar -->
+
+</body>
+</html>
