@@ -317,6 +317,10 @@ $(document).ready(function() {
         isEditing = false;
         clearForm();
         $('#modalTitle').text('Agregar Perfil');
+
+        // Asegurar que el campo ID esté completamente vacío
+        $('#id').val('');
+
         perfilModal.show();
     }
 
@@ -332,7 +336,14 @@ $(document).ready(function() {
 
     function clearForm() {
         $('#formPerfil')[0].reset();
+
+        // Limpiar específicamente el campo ID
+        $('#id').val('');
+
         clearFieldErrors();
+
+        // Resetear el estado de edición
+        isEditing = false;
     }
 
     function showFieldError(field, message) {
