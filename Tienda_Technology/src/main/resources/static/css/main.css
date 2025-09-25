@@ -13,50 +13,96 @@ body {
 
 
 /* ========================== SIDEBAR DINAMICO ========================*/
-.sidebarDinamic{
-    background-color: #102b44;
+.sidebarDinamic {
+    background: linear-gradient(180deg, #102b44 0%, #0a1c2e 100%);
     color: #ffffff;
-}
-
-.sidebarDinamic .tituloApp{
-    color: #ffffff;
-    margin-top: 1rem;
-    margin-left: 2rem;
-}
-
-.sidebarDinamic .nav-link.active {
-    background-color: #070d15;
-    color: white;
-}
-
-.sidebarDinamic .nav-link.active:hover {
-    background-color: #2d2d52;
-}
-
-.sidebarDinamic .contenedorSalir{
-    border-radius: 8px;
     border: 2px solid #ffffff;
 }
 
-.sidebarDinamic .contenedorSalir:hover{
-    border-radius: 8px;
-    border: 2px solid #fafafa;
-    background-color: #ffffff;
-}
-
-.sidebarDinamic .botonSalirApp{
+.sidebarDinamic .tituloApp {
     color: #ffffff;
-    font-weight: bold;
-    margin-left: 2.5rem;
+    margin-top: 1rem;
+    margin-left: 2rem;
+    transition: color 0.3s ease;
 }
 
-.sidebarDinamic .botonSalirApp:hover{
-    color: #d31111;
-    margin-left: 2.5rem;
+.sidebarDinamic .tituloApp:hover {
+    color: rgba(255, 254, 254, 0.75);
 }
 
+/* ESTILOS PARA LOS LINKS DEL MENU */
+.sidebarDinamic .nav-link {
+    color: #b8c2cc !important;
+    border-radius: 8px;
+    margin: 5px 0;
+    padding: 12px ;
+    transition: all 0.3s ease;
+    border: none;
+    font-weight: 500;
+    display: flex;
+    align-items: center;
+}
+
+.sidebarDinamic .nav-link:hover {
+    color: #ffffff !important;
+    background-color: rgba(255, 255, 255, 0.1);
+    transform: translateX(5px);
+}
+
+/* ESTILO ACTIVO MEJORADO */
+.sidebarDinamic .nav-link.active {
+    background: linear-gradient(135deg, #0dff07 0%, #18da84 100%) !important;
+    color: #ffffff !important;
+    box-shadow: 0 4px 12px rgba(83, 239, 31, 0.3);
+    border-left: 4px solid #ffffff;
+    transition: all 0.3s ease;
+}
+
+.sidebarDinamic .nav-link.active:hover {
+    background: linear-gradient(135deg, #0ebe0b 0%, #13a466 100%) !important;
+    color: #ffffff !important;
+    transform: translateX(5px);
+}
+
+/* Iconos dentro de los links */
+.sidebarDinamic .nav-link i {
+    width: 20px;
+    margin-right: 10px;
+    font-size: 1.1em;
+}
+
+/* BOTÓN CERRAR SESIÓN MEJORADO */
+.sidebarDinamic .contenedorSalir {
+    border-radius: 8px;
+    border: 2px solid rgba(255, 255, 255, 0.2);
+    background: rgba(255, 255, 255, 0.05);
+    transition: all 0.3s ease;
+}
+
+.sidebarDinamic .contenedorSalir:hover {
+    border: 2px solid rgba(255, 255, 255, 0.3);
+    background: linear-gradient(135deg, #811a1b 0%, #5d0303 100%) !important;
+    transform: translateX(5px);
+    color: #f6f6f6 !important;
+}
+
+.sidebarDinamic .botonSalirApp {
+    color: #ffffff !important;
+    font-weight: 600;
+    padding: 12px 24px ;
+    transition: all 0.3s ease;
+}
+
+.sidebarDinamic .botonSalirApp:hover {
+    color: #f6f6f6 !important;
+    background: linear-gradient(135deg, #811a1b 0%, #5d0303 100%) !important;
+    transform: translateX(0px);
+}
+
+/* Resto del CSS existente... */
 .sidebar {
     position: fixed;
+    border-radius: 10px;
     top: 0;
     bottom: 0;
     left: 0;
@@ -64,12 +110,13 @@ body {
     padding: 48px 0 0;
     box-shadow: inset -1px 0 0 rgba(0, 0, 0, .1);
     transition: transform .3s ease-in-out;
-    width: 250px;
+    width: 248px; /* Un poco más ancho */
 }
 
 @media (max-width: 767.98px) {
     .sidebar {
         transform: translateX(-100%);
+        width: 280px;
     }
     .sidebar.active {
         transform: translateX(0);

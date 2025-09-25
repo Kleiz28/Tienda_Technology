@@ -16,23 +16,31 @@
         <div class="d-flex align-items-center justify-content-between mb-3">
             <a th:href="@{/dashboard}" class="fs-4 tituloApp text-decoration-none fw-bold">Gestion App</a>
             <button id="close-sidebar" class="btn btn-dark d-md-none p-0">
-                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" class="bi bi-x-lg" viewBox="0 0 16 16"><path d="M2.146 2.854a.5.5 0 1 1 .708-.708L8 7.293l5.146-5.147a.5.5 0 0 1 .708.708L8.707 8l5.147 5.146a.5.5 0 0 1-.708.708L8 8.707l-5.146 5.147a.5.5 0 0 1-.708-.708L7.293 8z"/></svg>
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" class="bi bi-x-lg" viewBox="0 0 16 16">
+                    <path d="M2.146 2.854a.5.5 0 1 1 .708-.708L8 7.293l5.146-5.147a.5.5 0 0 1 .708.708L8.707 8l5.147 5.146a.5.5 0 0 1-.708.708L8 8.707l-5.146 5.147a.5.5 0 0 1-.708-.708L7.293 8z"/>
+                </svg>
             </button>
         </div>
         <hr>
-        <!-- Menú dinámico: itera sobre las opciones guardadas en la sesión -->
+
+        <!-- Menú dinámico CORREGIDO -->
         <ul class="nav nav-pills flex-column mb-auto">
-            <li th:each="opcion : ${session.menuOpciones}">
+            <li th:each="opcion : ${session.menuOpciones}" class="nav-item">
                 <a th:href="@{${opcion.ruta}}"
                    class="nav-link text-white rounded-lg"
-                   th:classappend="${opcion.ruta == activeUri} ? 'active' : ''">
+                   th:classappend="${#strings.contains(activeUri, opcion.ruta) or #strings.contains(opcion.ruta, activeUri)} ? 'active' : ''">
                     <span th:text="${opcion.nombre}"></span>
                 </a>
             </li>
         </ul>
+
         <hr>
         <ul class="nav nav-pills contenedorSalir flex-column">
-            <li><a th:href="@{/logout}" class="nav-link botonSalirApp rounded-lg">Cerrar Sesión</a></li>
+            <li class="nav-item">
+                <a th:href="@{/logout}" class="nav-link botonSalirApp rounded-lg">
+                    <i class="bi bi-box-arrow-right "></i>Cerrar Sesión
+                </a>
+            </li>
         </ul>
     </nav>
 </div>
