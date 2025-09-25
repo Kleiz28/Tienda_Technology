@@ -92,7 +92,7 @@ $(document).ready(function() {
         const puedeEditar = row.estado === 'ACTIVO' || row.estado === 'INACTIVO';
         const puedeActivar = row.estado === 'INACTIVO';
         const puedeInactivar = row.estado === 'ACTIVO';
-        const puedeEliminar = row.estado !== 'ELIMINADO' && row.cantidadProductosActivos === 0;
+        const puedeEliminar = row.estado !== 'ELIMINADO';
 
         return `
             <div class="d-flex gap-1">
