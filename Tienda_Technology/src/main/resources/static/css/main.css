@@ -4,7 +4,6 @@
  */
 
 /* ============================== GENERAL =============================*/
-
 body {
     background-color: #f8f9fa;
     font-family: 'Inter', sans-serif;
@@ -42,7 +41,7 @@ body {
 
 .sidebarDinamic .nav-link:hover {
     color: #ffffff !important;
-    background-color: rgba(255, 255, 255, 0.1);
+    background: linear-gradient(135deg, #0ebe0b 0%, #13a466 100%);
     transform: translateX(5px);
 }
 
@@ -124,6 +123,59 @@ body {
         display: block;
     }
 }
+
+
+/* ========================= DASHBOARD =======================*/
+.barraDashboard{
+    background: linear-gradient(90deg, #0d6efd 0%, #6610f2 100%);
+    color: #ffffff;
+    padding: 10px 20px;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(13, 110, 253, 0.5);
+    margin: 2px 5px 0px 2px;
+}
+
+.presentacionDashboard{
+    background: linear-gradient(90deg, #a5ccc0 0%, #b1cea7 100%);
+    color: #ffffff;
+    padding: 10px 20px;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(25, 135, 84, 0.5);
+    margin: 2px 5px 0px 2px;
+}
+
+.conjuntoBanner .bannerGeneral{
+    background: #f6f6f6;
+    color: #130707;
+}
+
+.conjuntoBanner .bannerGeneral .card-body{
+    color: #130707;
+}
+
+.conjuntoBanner .bannerNuevoUsuario{
+    background: #f6f6f6;
+    color: #130707;
+    box-shadow: 0 4px 12px rgba(25, 60, 135, 0.5);
+    border: 3px solid #061cb2;
+}
+
+.conjuntoBanner .bannerUsuarios{
+    background: #f6f6f6;
+    color: #130707;
+    box-shadow: 0 4px 12px rgba(135, 25, 38, 0.5);
+    border: 3px solid #b40d1f;
+}
+
+.conjuntoBanner .bannerReportes{
+    background: #f6f6f6;
+    color: #130707;
+    box-shadow: 0 4px 12px rgba(135, 117, 25, 0.5);
+    border: 3px solid #cbb214;
+}
+
+
+
 
 .worker-photo {
     width: 50px;

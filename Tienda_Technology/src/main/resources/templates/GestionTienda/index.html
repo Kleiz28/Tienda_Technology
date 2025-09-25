@@ -20,7 +20,7 @@
     <div th:replace="~{GestionTienda/sidebar :: sidebar(activeUri='/dashboard')}"></div>
 
     <div id="main-content" class="main-content w-100">
-        <header class="p-3 mb-3 border-bottom bg-white shadow-sm">
+        <header class="p-3 mb-3 barraDashboard ">
             <div class="d-flex align-items-center">
                 <button id="open-sidebar" class="btn btn-light d-md-none me-3 p-1">
                     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" class="bi bi-list" viewBox="0 0 16 16"><path fill-rule="evenodd" d="M2.5 12a.5.5 0 0 1 .5-.5h10a.5.5 0 0 1 0 1H3a.5.5 0 0 1-.5-.5m0-4a.5.5 0 0 1 .5-.5h10a.5.5 0 0 1 0 1H3a.5.5 0 0 1-.5-.5m0-4a.5.5 0 0 1 .5-.5h10a.5.5 0 0 1 0 1H3a.5.5 0 0 1-.5-.5"/></svg>
@@ -30,21 +30,29 @@
         </header>
 
         <main class="container-fluid p-4">
-            <div class="row g-4">
+
+            <div class="card presentacionDashboard mt-0 mb-5 rounded-lg">
+                <div class="card-body">
+                    <h2 class="card-title h4 fw-bold">¡Bienvenido a la aplicación Acceso!</h2>
+                    <p class="card-text text-muted">Usa el menú de la izquierda o las tarjetas de acceso rápido para navegar por el sistema.</p>
+                </div>
+            </div>
+
+            <div class="conjuntoBanner row g-4">
                 <!-- Total de Usuarios -->
-                <div class="col-sm-6 col-lg-4">
-                    <div class="card text-white bg-primary shadow-sm h-100">
+                <div class="bannerGeneral col-sm-6 col-lg-4">
+                    <div class="card bannerUsuarios h-100">
                         <div class="card-body">
                             <div class="d-flex justify-content-between align-items-start">
                                 <div>
                                     <h5 class="card-title fw-semibold">Total de Usuarios</h5>
                                     <h2 class="display-4 fw-bold" th:text="${totalUsuarios}">0</h2>
                                 </div>
-                                <div class="card-icon text-white">
+                                <div class="card-icon text-danger">
                                     <svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" fill="currentColor" class="bi bi-people-fill" viewBox="0 0 16 16"><path d="M7 14s-1 0-1-1 1-4 5-4 5 3 5 4-1 1-1 1zm4-6a3 3 0 1 0 0-6 3 3 0 0 0 0 6m-5.784 6A2.238 2.238 0 0 1 5 13c0-1.355.68-2.75 1.936-3.72A6.325 6.325 0 0 0 5 9c-4 0-5 3-5 4s1 1 1 1zM4.5 8a2.5 2.5 0 1 0 0-5 2.5 2.5 0 0 0 0 5"/></svg>
                                 </div>
                             </div>
-                            <a th:href="@{/usuarios/listar}" class="text-white d-block mt-3 opacity-75 text-decoration-none">
+                            <a th:href="@{/usuarios/listar}" class="d-block text-danger mt-3 opacity-75 text-decoration-none">
                                 Ver detalles &rarr;
                             </a>
                         </div>
@@ -52,19 +60,19 @@
                 </div>
 
                 <!-- Nuevo Usuario -->
-                <div class="col-sm-6 col-lg-4">
-                    <div class="card text-white bg-success shadow-sm h-100">
+                <div class="bannerGeneral col-sm-6 col-lg-4">
+                    <div class="card bannerNuevoUsuario h-100">
                         <div class="card-body">
                             <div class="d-flex justify-content-between align-items-start">
                                 <div>
                                     <h5 class="card-title fw-semibold">Nuevo Usuario</h5>
-                                    <p class="card-text text-white opacity-75">Añadir un nuevo registro.</p>
+                                    <p class="card-text opacity-75">Añadir un nuevo registro.</p>
                                 </div>
-                                <div class="card-icon text-white">
+                                <div class="card-icon text-primary">
                                     <svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" fill="currentColor" class="bi bi-person-plus-fill" viewBox="0 0 16 16"><path d="M1 14s-1 0-1-1 1-4 6-4 6 3 6 4-1 1-1 1zm5-6a3 3 0 1 0 0-6 3 3 0 0 0 0 6"/><path fill-rule="evenodd" d="M13.5 5a.5.5 0 0 1 .5.5V7h1.5a.5.5 0 0 1 0 1H14v1.5a.5.5 0 0 1-1 0V8h-1.5a.5.5 0 0 1 0-1H13.5z"/></svg>
                                 </div>
                             </div>
-                            <a th:href="@{/usuarios/listar}" class="text-white d-block mt-3 opacity-75 text-decoration-none">
+                            <a th:href="@{/usuarios/listar}" class="d-block text-primary mt-3 opacity-75 text-decoration-none">
                                 Ir al formulario &rarr;
                             </a>
                         </div>
@@ -72,19 +80,19 @@
                 </div>
 
                 <!-- Reportes -->
-                <div class="col-sm-6 col-lg-4">
-                    <div class="card text-white bg-warning shadow-sm h-100">
+                <div class="bannerGeneral col-sm-6 col-lg-4">
+                    <div class="card bannerReportes h-100">
                         <div class="card-body">
                             <div class="d-flex justify-content-between align-items-start">
                                 <div>
                                     <h5 class="card-title fw-semibold">Reportes</h5>
                                     <p class="card-text text-black-50">Visualizar y exportar datos.</p>
                                 </div>
-                                <div class="card-icon text-white">
+                                <div class="card-icon text-warning">
                                     <svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" fill="currentColor" class="bi bi-bar-chart-fill" viewBox="0 0 16 16"><path d="M1 11a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1v3a1 1 0 0 1-1 1H2a1 1 0 0 1-1-1zm5-4a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1v7a1 1 0 0 1-1 1H7a1 1 0 0 1-1-1zm5-5a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1v11a1 1 0 0 1-1 1h-2a1 1 0 0 1-1-1z"/></svg>
                                 </div>
                             </div>
-                            <a href="#" class="text-black-50 d-block mt-3 opacity-75 text-decoration-none">
+                            <a href="#" class="d-block text-warning mt-3 opacity-75 text-decoration-none">
                                 Próximamente...
                             </a>
                         </div>
@@ -92,12 +100,6 @@
                 </div>
             </div>
 
-            <div class="card shadow-sm mt-4 rounded-lg">
-                <div class="card-body">
-                    <h2 class="card-title h4 fw-bold">¡Bienvenido a la aplicación Acceso!</h2>
-                    <p class="card-text text-muted">Usa el menú de la izquierda o las tarjetas de acceso rápido para navegar por el sistema.</p>
-                </div>
-            </div>
         </main>
     </div>
 </div>
