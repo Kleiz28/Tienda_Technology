@@ -3,9 +3,56 @@
  * Archivo: src/main/resources/static/css/main.css
  */
 
+/* ============================== GENERAL =============================*/
+
 body {
     background-color: #f8f9fa;
     font-family: 'Inter', sans-serif;
+}
+
+
+
+/* ========================== SIDEBAR DINAMICO ========================*/
+.sidebarDinamic{
+    background-color: #102b44;
+    color: #ffffff;
+}
+
+.sidebarDinamic .tituloApp{
+    color: #ffffff;
+    margin-top: 1rem;
+    margin-left: 2rem;
+}
+
+.sidebarDinamic .nav-link.active {
+    background-color: #070d15;
+    color: white;
+}
+
+.sidebarDinamic .nav-link.active:hover {
+    background-color: #2d2d52;
+}
+
+.sidebarDinamic .contenedorSalir{
+    border-radius: 8px;
+    border: 2px solid #ffffff;
+}
+
+.sidebarDinamic .contenedorSalir:hover{
+    border-radius: 8px;
+    border: 2px solid #fafafa;
+    background-color: #ffffff;
+}
+
+.sidebarDinamic .botonSalirApp{
+    color: #ffffff;
+    font-weight: bold;
+    margin-left: 2.5rem;
+}
+
+.sidebarDinamic .botonSalirApp:hover{
+    color: #d31111;
+    margin-left: 2.5rem;
 }
 
 .sidebar {
