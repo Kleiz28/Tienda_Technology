@@ -10,11 +10,9 @@ body {
     font-family: 'Inter', sans-serif;
 }
 
-
-
 /* ========================== SIDEBAR DINAMICO ========================*/
 .sidebarDinamic {
-    background: linear-gradient(180deg, #102b44 0%, #0a1c2e 100%);
+    background: linear-gradient(180deg, #111921 0%, #363a46 100%);
     color: #ffffff;
     border: 2px solid #ffffff;
 }
@@ -30,7 +28,6 @@ body {
     color: rgba(255, 254, 254, 0.75);
 }
 
-/* ESTILOS PARA LOS LINKS DEL MENU */
 .sidebarDinamic .nav-link {
     color: #b8c2cc !important;
     border-radius: 8px;
@@ -49,7 +46,6 @@ body {
     transform: translateX(5px);
 }
 
-/* ESTILO ACTIVO MEJORADO */
 .sidebarDinamic .nav-link.active {
     background: linear-gradient(135deg, #0dff07 0%, #18da84 100%) !important;
     color: #ffffff !important;
@@ -64,14 +60,6 @@ body {
     transform: translateX(5px);
 }
 
-/* Iconos dentro de los links */
-.sidebarDinamic .nav-link i {
-    width: 20px;
-    margin-right: 10px;
-    font-size: 1.1em;
-}
-
-/* BOTÓN CERRAR SESIÓN MEJORADO */
 .sidebarDinamic .contenedorSalir {
     border-radius: 8px;
     border: 2px solid rgba(255, 255, 255, 0.2);
@@ -89,7 +77,7 @@ body {
 .sidebarDinamic .botonSalirApp {
     color: #ffffff !important;
     font-weight: 600;
-    padding: 12px 24px ;
+    padding: 12px 50px ;
     transition: all 0.3s ease;
 }
 
@@ -99,7 +87,6 @@ body {
     transform: translateX(0px);
 }
 
-/* Resto del CSS existente... */
 .sidebar {
     position: fixed;
     border-radius: 10px;
@@ -113,6 +100,18 @@ body {
     width: 248px; /* Un poco más ancho */
 }
 
+.sidebar-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0,0,0,0.5);
+    z-index: 99;
+    display: none;
+    cursor: pointer;
+}
+
 @media (max-width: 767.98px) {
     .sidebar {
         transform: translateX(-100%);
@@ -124,18 +123,6 @@ body {
     .sidebar-overlay.active {
         display: block;
     }
-}
-
-.sidebar-overlay {
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background-color: rgba(0,0,0,0.5);
-    z-index: 99;
-    display: none;
-    cursor: pointer;
 }
 
 .worker-photo {

@@ -23,7 +23,7 @@
         </div>
         <hr>
 
-        <!-- Menú dinámico CORREGIDO -->
+        <!-- Menú dinámico -->
         <ul class="nav nav-pills flex-column mb-auto">
             <li th:each="opcion : ${session.menuOpciones}" class="nav-item">
                 <a th:href="@{${opcion.ruta}}"
