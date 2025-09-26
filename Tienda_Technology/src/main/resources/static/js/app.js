@@ -3,36 +3,43 @@
  * Archivo: src/main/resources/static/js/main.js
  */
 
-$(document).ready(function() {
+// Espera a que el DOM esté listo
+document.addEventListener('DOMContentLoaded', function() {
     /**
      * Configura la interactividad del sidebar responsivo.
      */
     function setupSidebar() {
-        const sidebar = $('#sidebar');
-        const openSidebarBtn = $('#open-sidebar');
-        const closeSidebarBtn = $('#close-sidebar');
-        const sidebarOverlay = $('#sidebar-overlay');
+        const sidebar = document.getElementById('sidebar');
+        const openSidebarBtn = document.getElementById('open-sidebar');
+        const closeSidebarBtn = document.getElementById('close-sidebar');
+        const sidebarOverlay = document.getElementById('sidebar-overlay');
 
-        openSidebarBtn.on('click', function() {
-            sidebar.addClass('active');
-            sidebarOverlay.addClass('active');
-        });
-
-        function closeSidebar() {
-            sidebar.removeClass('active');
-            sidebarOverlay.removeClass('active');
+        if (openSidebarBtn && sidebar) {
+            openSidebarBtn.addEventListener('click', function() {
+                sidebar.classList.add('active');
+                if (sidebarOverlay) sidebarOverlay.classList.add('active');
+            });
         }
 
-        closeSidebarBtn.on('click', closeSidebar);
-        sidebarOverlay.on('click', closeSidebar);
+        function closeSidebar() {
+            if (sidebar) sidebar.classList.remove('active');
+            if (sidebarOverlay) sidebarOverlay.classList.remove('active');
+        }
+
+        if (closeSidebarBtn) {
+            closeSidebarBtn.addEventListener('click', closeSidebar);
+        }
+
+        if (sidebarOverlay) {
+            sidebarOverlay.addEventListener('click', closeSidebar);
+        }
     }
 
-    // Inicializar la funcionalidad del sidebar en cada carga de página.
+    // Inicializar la funcionalidad del sidebar
     setupSidebar();
 });
 
-class TiendaApp{
-
+class TiendaApp {
     constructor() {
         this.currentUser = null;
         this.init();
@@ -40,6 +47,7 @@ class TiendaApp{
 
     init() {
         this.loadCurrentUser();
+        this.setupEventListeners();
         this.updateNavigation();
     }
 
@@ -47,8 +55,33 @@ class TiendaApp{
     loadCurrentUser() {
         const userData = localStorage.getItem('minimarket_current_user');
         if (userData) {
-            this.currentUser = JSON.parse(userData);
-            this.updateUserDisplay();
+            try {
+                this.currentUser = JSON.parse(userData);
+                this.updateUserDisplay();
+            } catch (e) {
+                console.error('Error parsing user data:', e);
+                localStorage.removeItem('minimarket_current_user');
+            }
+        }
+    }
+
+    setupEventListeners() {
+        // Logout button
+        const logoutBtn = document.getElementById('logoutBtn');
+        if (logoutBtn) {
+            logoutBtn.addEventListener('click', (e) => {
+                e.preventDefault();
+                this.logout();
+            });
+        }
+
+        // Profile button
+        const profileBtn = document.getElementById('profileBtn');
+        if (profileBtn) {
+            profileBtn.addEventListener('click', (e) => {
+                e.preventDefault();
+                this.showProfile();
+            });
         }
     }
 
@@ -75,16 +108,19 @@ class TiendaApp{
         this.currentUser = user;
         localStorage.setItem('minimarket_current_user', JSON.stringify(user));
         this.updateUserDisplay();
-        this.updateNavigation(); // Actualizar navegación al cambiar usuario
+        this.updateNavigation();
     }
 
     logout() {
         this.currentUser = null;
         localStorage.removeItem('minimarket_current_user');
-        this.updateNavigation(); // Actualizar navegación al cerrar sesión
-        window.location.href = 'login.html';
+        this.updateNavigation();
+        window.location.href = '/login';
     }
 
+    showProfile() {
+        alert('Funcionalidad de perfil en desarrollo');
+    }
 
     updateUserDisplay() {
         const userNameElement = document.getElementById('currentUser');
@@ -93,3 +129,8 @@ class TiendaApp{
         }
     }
 }
+
+// Inicializar la aplicación cuando el DOM esté listo
+document.addEventListener('DOMContentLoaded', function() {
+    window.tiendaApp = new TiendaApp();
+});

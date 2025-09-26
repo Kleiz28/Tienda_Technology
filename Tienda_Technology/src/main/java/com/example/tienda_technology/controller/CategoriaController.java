@@ -217,4 +217,38 @@ public class CategoriaController {
             return ResponseEntity.internalServerError().body(response);
         }
     }
+
+    @GetMapping("/api/tienda/activas")
+    @ResponseBody
+    public ResponseEntity<?> listarCategoriasParaTienda() {
+        Map<String, Object> response = new HashMap<>();
+        try {
+            List<Categoria> categorias = categoriaService.listarCategoriasActivas();
+
+            List<Map<String, Object>> categoriasTienda = categorias.stream()
+                    .map(categoria -> {
+                        Map<String, Object> catMap = new HashMap<>();
+                        catMap.put("id", categoria.getId());
+                        catMap.put("nombre", categoria.getNombre());
+                        catMap.put("valor", categoria.getNombre().toLowerCase()
+                                .replace(" ", "-")
+                                .replace("á", "a")
+                                .replace("é", "e")
+                                .replace("í", "i")
+                                .replace("ó", "o")
+                                .replace("ú", "u"));
+                        return catMap;
+                    })
+                    .collect(Collectors.toList());
+
+            response.put("success", true);
+            response.put("data", categoriasTienda);
+            return ResponseEntity.ok(response);
+
+        } catch (Exception e) {
+            response.put("success", false);
+            response.put("message", "Error al cargar categorías: " + e.getMessage());
+            return ResponseEntity.internalServerError().body(response);
+        }
+    }
 }

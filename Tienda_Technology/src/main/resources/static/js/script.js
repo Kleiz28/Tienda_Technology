@@ -1,105 +1,6 @@
-const productos = [
-    {
-        id: 1,
-        nombre: "Smart TV 4K 55 Pulgadas",
-        categoria: "televisor",
-        precio: 1899.99,
-        imagen: "https://images.samsung.com/is/image/samsung/es-uhd-ku6500-ue55ku6500uxxc-008-composite2-black?$L2-Thumbnail$",
-        descripcion: "Televisor inteligente con resolución 4K UHD, HDR10 y sistema operativo Android TV."
-    },
-    {
-        id: 2,
-        nombre: "Drone DJI Mavic Air 2",
-        categoria: "drones",
-        precio: 3299.99,
-        imagen: "https://m.media-amazon.com/images/I/71C2W+bBW6L._AC_.jpg",
-        descripcion: "Drone profesional con cámara 4K, 48MP y autonomía de vuelo de 34 minutos."
-    },
-    {
-        id: 3,
-        nombre: "Laptop Gamer ASUS ROG",
-        categoria: "computadora",
-        precio: 4599.99,
-        imagen: "https://m.media-amazon.com/images/I/81RIr5YR3QL._AC_SL1500_.jpg",
-        descripcion: "Laptop gaming con procesador Intel i7, RTX 3060 y 16GB RAM para máximo rendimiento."
-    },
-    {
-        id: 4,
-        nombre: "OLED TV 65 Pulgadas Sony",
-        categoria: "televisor",
-        precio: 4299.99,
-        imagen: "https://m.media-amazon.com/images/I/81aMS6p4xlL.jpg",
-        descripcion: "Televisor OLED con calidad de imagen excepcional, Dolby Vision y sonido Acoustic Surface."
-    },
-    {
-        id: 5,
-        nombre: "Drone Autel EVO Lite+",
-        categoria: "drones",
-        precio: 2899.99,
-        imagen: "https://img.kentfaith.com/cache/catalog/products/us/GW47.0015/GW47.0015-1-1200x1200.jpg",
-        descripcion: "Drone con cámara 6K, sensor de 1 pulgada y evitación de obstáculos inteligente."
-    },
-    {
-        id: 6,
-        nombre: "MacBook Pro 14 M2 Pro",
-        categoria: "computadora",
-        precio: 7899.99,
-        imagen: "https://es.digitaltrends.com/wp-content/uploads/2023/01/macboo-pro-14-m2-pro-26.jpg?p=1",
-        descripcion: "Laptop profesional con chip M2 Pro, pantalla Liquid Retina XDR y 16GB de memoria unificada."
-    },
-    {
-        id: 7,
-        nombre: "QLED TV 75 Pulgadas Samsung",
-        categoria: "televisor",
-        precio: 3499.99,
-        imagen: "https://images.samsung.com/is/image/samsung/p6pim/br/qn75qn85cagxzd/gallery/br-qled-tv-qn75qn85cagxzd-qn--qn--cagxzd-thumb-536764565",
-        descripcion: "Smart TV QLED con Quantum HDR, Alexa integrada y diseño sin bordes."
-    },
-    {
-        id: 8,
-        nombre: "Drone DJI Mini 3 Pro",
-        categoria: "drones",
-        precio: 2499.99,
-        imagen: "https://th.bing.com/th/id/R.3b5253c2ebb0316e3da2d6601a98073e?rik=4C8WK1l3U4XD6A&pid=ImgRaw&r=0",
-        descripcion: "Drone compacto con cámara 4K, menos de 249g y seguimiento de sujetos automático."
-    },
-    {
-        id: 9,
-        nombre: "PC Gamer Ryzen 7 RTX 4070",
-        categoria: "computadora",
-        precio: 5999.99,
-        imagen: "https://etchile.net/wp-content/uploads/2024/04/pc_gamer_5700x_GBT_RTX4070_off_02-768x768.jpg",
-        descripcion: "Computadora de escritorio con Ryzen 7 5800X, RTX 4070 12GB, 32GB RAM y SSD 1TB."
-    },
-    {
-        id: 10,
-        nombre: "Smart TV 32 Pulgadas HD",
-        categoria: "televisor",
-        precio: 899.99,
-        imagen: "https://www.claroshop.com/c/algolia/assets/categorias/c-pantallas-smartv.webp",
-        descripcion: "Televisor HD perfecto para dormitorios, con Smart TV y múltiples puertos HDMI."
-    },
-    {
-        id: 11,
-        nombre: "Drone Holy Stone HS720",
-        categoria: "drones",
-        precio: 1299.99,
-        imagen: "https://i5.walmartimages.com/asr/00eeb04a-6c11-4451-b3e9-390a73c2fdca.c6c7568d7eeeea05b856c0e96be7ca62.jpeg",
-        descripcion: "Drone para principiantes con GPS, cámara 4K y función de retorno automático."
-    },
-    {
-        id: 12,
-        nombre: "Laptop Dell XPS 13",
-        categoria: "computadora",
-        precio: 4299.99,
-        imagen: "https://www.windowscentral.com/sites/wpcentral.com/files/styles/xlarge_wm_brb/public/field/image/2016/12/dell-xps-13-hero.jpg?itok=PcpkH19l",
-        descripcion: "Ultrabook premium con pantalla InfinityEdge, Intel i7 y 16GB RAM, ideal para trabajo."
-    }
-];
-
-// Carrito de compras
 let carrito = JSON.parse(localStorage.getItem('carrito')) || [];
-
+let categorias = [];
+let productosDesdeAPI = [];
 // Guardar carrito en localStorage
 function guardarCarrito() {
     localStorage.setItem('carrito', JSON.stringify(carrito));
@@ -128,23 +29,31 @@ function mostrarSeccion(idSeccion) {
     window.scrollTo(0, 0);
 }
 
-// Cargar productos destacados
+// Modificar la función cargarProductosDestacados para usar productos desde API
 function cargarProductosDestacados() {
     const contenedorDestacados = document.getElementById('productos-destacados');
+    if (!contenedorDestacados) return;
+
     contenedorDestacados.innerHTML = '';
 
-    const productosDestacados = [...productos].sort(() => 0.5 - Math.random()).slice(0, 3);
+    const productosDestacados = [...productosDesdeAPI]
+        .sort(() => 0.5 - Math.random())
+        .slice(0, 3);
 
     productosDestacados.forEach(producto => {
         const tarjetaProducto = `
             <div class="col-md-4 mb-4">
                 <div class="card h-100">
-                    <img src="${producto.imagen}" class="card-img-top" alt="${producto.nombre}">
+                    <img src="${producto.imagen || 'https://via.placeholder.com/300x200?text=Imagen+No+Disponible'}" 
+                         class="card-img-top" alt="${producto.nombre}"
+                         style="height: 200px; object-fit: cover;">
                     <div class="card-body">
                         <h5 class="card-title">${producto.nombre}</h5>
-                        <p class="card-text">${producto.descripcion}</p>
-                        <p class="precio">S/${producto.precio.toFixed(2)}</p>
-                        <button class="btn btn-sm btn-primary" onclick="agregarAlCarrito(${producto.id})">Añadir al carrito</button>
+                        <p class="card-text">${producto.descripcion || 'Sin descripción'}</p>
+                        <p class="precio">S/${(parseFloat(producto.precio) || 0).toFixed(2)}</p>
+                        <button class="btn btn-sm btn-primary" onclick="agregarAlCarrito(${producto.id})">
+                            Añadir al carrito
+                        </button>
                     </div>
                 </div>
             </div>
@@ -153,41 +62,182 @@ function cargarProductosDestacados() {
     });
 }
 
-// Filtrar productos
-function filtrarProductos(categoria = null) {
+
+
+// Función mejorada para cargar categorías
+// Versión con endpoints alternativos
+async function cargarCategoriasDesdeAPI() {
+    const endpoints = [
+        '/api/tienda/categorias',  // Nuevo endpoint
+        '/categorias/api/tienda/activas',
+        '/categorias/api/activas'
+    ];
+
+    for (const endpoint of endpoints) {
+        try {
+            console.log(`Probando endpoint: ${endpoint}`);
+            const response = await fetch(endpoint);
+
+            if (response.ok) {
+                const data = await response.json();
+                if (data.success) {
+                    console.log(`✅ Éxito con endpoint: ${endpoint}`);
+                    return data.data;
+                }
+            }
+        } catch (error) {
+            console.warn(`Error con endpoint ${endpoint}:`, error.message);
+        }
+    }
+
+    console.warn('⚠️ Todos los endpoints fallaron, usando categorías por defecto');
+    return getCategoriasPorDefecto();
+}
+
+// Función para cargar productos desde API
+async function cargarProductosDesdeAPI() {
+    const endpoints = [
+        '/api/tienda/productos',  // Nuevo endpoint
+        '/productos/api/activos'
+    ];
+
+    for (const endpoint of endpoints) {
+        try {
+            console.log(`Cargando productos desde: ${endpoint}`);
+            const response = await fetch(endpoint);
+
+            if (response.ok) {
+                const data = await response.json();
+                if (data.success) {
+                    console.log(`✅ Productos cargados: ${data.data.length}`);
+                    return data.data;
+                }
+            }
+        } catch (error) {
+            console.warn(`Error cargando productos desde ${endpoint}:`, error.message);
+        }
+    }
+
+    console.warn('⚠️ No se pudieron cargar productos desde API, usando datos locales');
+    return productos; // Fallback a datos locales
+}
+
+// Función de categorías por defecto
+function getCategoriasPorDefecto() {
+    return [
+        { id: 1, nombre: "Computadora", valor: "computadora" },
+        { id: 2, nombre: "Televisor", valor: "televisor" },
+        { id: 3, nombre: "Drones", valor: "drones" }
+    ];
+}
+
+// Función para inicializar la tienda
+async function inicializarTienda() {
+    try {
+        // Cargar categorías y productos en paralelo
+        const [categoriasCargadas, productosCargados] = await Promise.all([
+            cargarCategoriasDesdeAPI(),
+            cargarProductosDesdeAPI()
+        ]);
+
+        categorias = categoriasCargadas;
+        productosDesdeAPI = productosCargados;
+
+        console.log(`📊 Tienda inicializada: ${categorias.length} categorías, ${productosDesdeAPI.length} productos`);
+
+        // Actualizar la interfaz
+        actualizarFiltrosCategorias();
+        actualizarCategoriasFooter();
+        cargarProductosDestacados();
+
+    } catch (error) {
+        console.error('❌ Error inicializando tienda:', error);
+        // Usar datos por defecto
+        categorias = getCategoriasPorDefecto();
+        productosDesdeAPI = productos;
+        actualizarFiltrosCategorias();
+        actualizarCategoriasFooter();
+    }
+}
+
+// Función para actualizar los filtros de categoría
+function actualizarFiltrosCategorias() {
+    const filtrosContainer = document.querySelector('.card-body');
+    if (!filtrosContainer) return;
+
+    // Limpiar filtros existentes
+    const existingFilters = filtrosContainer.querySelectorAll('.categoria-filter');
+    existingFilters.forEach(filter => filter.remove());
+
+    // Agregar nuevos filtros
+    categorias.forEach(categoria => {
+        const checkboxDiv = document.createElement('div');
+        checkboxDiv.className = 'form-check mb-2 categoria-filter';
+        checkboxDiv.innerHTML = `
+            <input class="form-check-input" type="checkbox" value="${categoria.valor}" 
+                   id="cat-${categoria.valor}">
+            <label class="form-check-label" for="cat-${categoria.valor}">
+                ${categoria.nombre}
+                ${categoria.cantidadProductos ? `(${categoria.cantidadProductos})` : ''}
+            </label>
+        `;
+        filtrosContainer.appendChild(checkboxDiv);
+
+        // Agregar event listener
+        const checkbox = document.getElementById(`cat-${categoria.valor}`);
+        if (checkbox) {
+            checkbox.addEventListener('change', () => filtrarProductos());
+        }
+    });
+}
+
+
+// Filtrar productos (usando productos desde API)
+async function filtrarProductos(categoria = null) {
     const listaProductos = document.getElementById('lista-productos');
+    if (!listaProductos) return;
+
     listaProductos.innerHTML = '';
 
+    // Obtener categorías seleccionadas
     const categoriasSeleccionadas = [];
-    if (document.getElementById('cat-computadora').checked) categoriasSeleccionadas.push('computadora');
-    if (document.getElementById('cat-televisor').checked) categoriasSeleccionadas.push('televisor');
-    if (document.getElementById('cat-drones').checked) categoriasSeleccionadas.push('drones');
+    categorias.forEach(cat => {
+        const checkbox = document.getElementById(`cat-${cat.valor}`);
+        if (checkbox && checkbox.checked) {
+            categoriasSeleccionadas.push(cat.valor);
+        }
+    });
 
-    const filtroPrecio = document.querySelector('input[name="filtroPrecio"]:checked').value;
+    const filtroPrecio = document.querySelector('input[name="filtroPrecio"]:checked')?.value || 'todos';
 
     if (categoria) {
         categoriasSeleccionadas.length = 0;
         categoriasSeleccionadas.push(categoria);
-        document.getElementById(`cat-${categoria}`).checked = true;
+        const checkbox = document.getElementById(`cat-${categoria}`);
+        if (checkbox) checkbox.checked = true;
     }
 
-    let productosFiltrados = productos;
+    let productosFiltrados = productosDesdeAPI;
 
+    // Filtrar por categoría
     if (categoriasSeleccionadas.length > 0) {
         productosFiltrados = productosFiltrados.filter(producto =>
-            categoriasSeleccionadas.includes(producto.categoria)
+            categoriasSeleccionadas.includes(producto.categoriaValor || producto.categoria)
         );
     }
 
+    // Filtrar por precio
     if (filtroPrecio !== 'todos') {
         productosFiltrados = productosFiltrados.filter(producto => {
-            if (filtroPrecio === 'bajo') return producto.precio < 1000;
-            if (filtroPrecio === 'medio') return producto.precio >= 1000 && producto.precio <= 3000;
-            if (filtroPrecio === 'alto') return producto.precio > 3000;
+            const precio = parseFloat(producto.precio) || 0;
+            if (filtroPrecio === 'bajo') return precio < 1000;
+            if (filtroPrecio === 'medio') return precio >= 1000 && precio <= 3000;
+            if (filtroPrecio === 'alto') return precio > 3000;
             return true;
         });
     }
 
+    // Mostrar resultados
     if (productosFiltrados.length === 0) {
         listaProductos.innerHTML = `
             <div class="col-12 text-center py-5">
@@ -200,12 +250,16 @@ function filtrarProductos(categoria = null) {
             const tarjetaProducto = `
                 <div class="col-md-4 mb-4">
                     <div class="card h-100">
-                        <img src="${producto.imagen}" class="card-img-top" alt="${producto.nombre}">
+                        <img src="${producto.imagen || 'https://via.placeholder.com/300x200?text=Imagen+No+Disponible'}" 
+                             class="card-img-top" alt="${producto.nombre}" 
+                             style="height: 200px; object-fit: cover;">
                         <div class="card-body">
                             <h5 class="card-title">${producto.nombre}</h5>
-                            <p class="card-text">${producto.descripcion}</p>
-                            <p class="precio">S/${producto.precio.toFixed(2)}</p>
-                            <button class="btn btn-sm btn-primary" onclick="agregarAlCarrito(${producto.id})">Añadir al carrito</button>
+                            <p class="card-text">${producto.descripcion || 'Sin descripción'}</p>
+                            <p class="precio">S/${(parseFloat(producto.precio) || 0).toFixed(2)}</p>
+                            <button class="btn btn-sm btn-primary" onclick="agregarAlCarrito(${producto.id})">
+                                Añadir al carrito
+                            </button>
                         </div>
                     </div>
                 </div>
@@ -213,6 +267,20 @@ function filtrarProductos(categoria = null) {
             listaProductos.innerHTML += tarjetaProducto;
         });
     }
+}
+
+
+// Función para actualizar el footer
+function actualizarCategoriasFooter() {
+    const footerCategorias = document.querySelector('.col-md-3.mb-1:nth-child(3) ul');
+    if (!footerCategorias) return;
+
+    footerCategorias.innerHTML = '';
+    categorias.forEach(categoria => {
+        const li = document.createElement('li');
+        li.innerHTML = `<a href="#" class="text-decoration-none" onclick="filtrarPorCategoria('${categoria.valor}')">${categoria.nombre}</a>`;
+        footerCategorias.appendChild(li);
+    });
 }
 
 // Ordenar productos
@@ -300,9 +368,10 @@ function buscarProductos(evento) {
     mostrarSeccion('productos');
 }
 
-// Añadir producto al carrito
+// Modificar agregarAlCarrito para buscar en productosDesdeAPI
 function agregarAlCarrito(idProducto) {
-    const producto = productos.find(p => p.id === idProducto);
+    const producto = productosDesdeAPI.find(p => p.id === idProducto) ||
+        productos.find(p => p.id === idProducto);
 
     if (!producto) {
         console.error('Producto no encontrado:', idProducto);
@@ -317,31 +386,26 @@ function agregarAlCarrito(idProducto) {
         carrito.push({
             id: producto.id,
             nombre: producto.nombre,
-            precio: producto.precio,
+            precio: parseFloat(producto.precio) || 0,
             imagen: producto.imagen,
             cantidad: 1
         });
     }
 
     guardarCarrito();
-
     actualizarContadorCarrito();
 
     if (document.getElementById('carrito').classList.contains('activa')) {
         actualizarCarrito();
     }
 
+    // Mostrar notificación
     const alerta = document.createElement('div');
     alerta.className = 'alert alert-success position-fixed bottom-0 end-0 m-3';
     alerta.style.zIndex = '1050';
-    alerta.innerHTML = `
-        <i class="bi bi-check-circle-fill"></i> Producto añadido al carrito
-    `;
+    alerta.innerHTML = `<i class="bi bi-check-circle-fill"></i> Producto añadido al carrito`;
     document.body.appendChild(alerta);
-
-    setTimeout(() => {
-        alerta.remove();
-    }, 3000);
+    setTimeout(() => alerta.remove(), 3000);
 }
 
 // Actualizar contador del carrito
@@ -524,20 +588,24 @@ function limpiarBusqueda() {
 }
 
 // Inicializar la página
-document.addEventListener('DOMContentLoaded', function() {
+document.addEventListener('DOMContentLoaded', async function() {
     carrito = JSON.parse(localStorage.getItem('carrito')) || [];
 
+    // Inicializar la tienda
+    await inicializarTienda();
+
+    // Configurar event listeners globales
     window.agregarAlCarrito = agregarAlCarrito;
     window.actualizarCantidad = actualizarCantidad;
     window.eliminarDelCarrito = eliminarDelCarrito;
     window.actualizarCarrito = actualizarCarrito;
     window.filtrarProductos = filtrarProductos;
+    window.filtrarPorCategoria = filtrarPorCategoria;
     window.ordenarProductos = ordenarProductos;
     window.buscarProductos = buscarProductos;
     window.limpiarBusqueda = limpiarBusqueda;
     window.mostrarSeccion = mostrarSeccion;
 
-    cargarProductosDestacados();
     actualizarContadorCarrito();
 
     if (document.getElementById('carrito').classList.contains('activa')) {

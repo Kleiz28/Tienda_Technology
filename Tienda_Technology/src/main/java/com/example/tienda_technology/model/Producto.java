@@ -168,7 +168,7 @@ public class Producto {
     }
 
     // Método para obtener el nombre de la categoría (para compatibilidad)
-    @JsonIgnore
+    @Transient
     public String getNombreCategoria() {
         return categoria != null ? categoria.getNombre() : null;
     }
