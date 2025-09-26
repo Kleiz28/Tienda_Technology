@@ -21,4 +21,6 @@ public interface PerfilService {
     List<Opcion> listarTodasLasOpciones();
 
     void eliminarPerfil(Long id);
+
+    long countByEstado(boolean estado);
 }

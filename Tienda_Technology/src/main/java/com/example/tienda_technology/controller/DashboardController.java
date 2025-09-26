@@ -4,6 +4,7 @@ package com.example.tienda_technology.controller;
 // Importaciones de clases necesarias de otros paquetes.
 
 import com.example.tienda_technology.service.CategoriaServiceImpl;
+import com.example.tienda_technology.service.PerfilServiceImpl;
 import com.example.tienda_technology.service.ProductoServiceImpl;
 import com.example.tienda_technology.service.UsuarioService;
 import org.springframework.stereotype.Controller;
@@ -19,10 +20,12 @@ public class DashboardController {
     private final UsuarioService usuarioService;
     private final ProductoServiceImpl productoService;
     private final CategoriaServiceImpl categoriaService;
+    private final PerfilServiceImpl perfilService;
 
     // Constructor para la inyección de dependencias. Spring automáticamente
     // proporcionará una instancia de UsuarioService.
-    public DashboardController(UsuarioService usuarioService, ProductoServiceImpl productoService, CategoriaServiceImpl categoriaService) {
+    public DashboardController(UsuarioService usuarioService, ProductoServiceImpl productoService, CategoriaServiceImpl categoriaService, PerfilServiceImpl perfilService) {
+        this.perfilService = perfilService;
         this.categoriaService = categoriaService;
         this.productoService = productoService;
         this.usuarioService = usuarioService;
@@ -38,6 +41,8 @@ public class DashboardController {
         long totalUsuarios = usuarioService.contarUsuarios();
         long totalProductos = productoService.contarProductos();
         long totalCategorias = categoriaService.contarCategoriasActivas();
+        long totalPerfiles = perfilService.countByEstado(true);
+
 
         // 2. 'model' es un objeto que permite pasar datos desde el controlador a la
         // vista (HTML).
@@ -45,6 +50,7 @@ public class DashboardController {
         model.addAttribute("totalUsuarios", totalUsuarios);
         model.addAttribute("totalProductos", totalProductos);
         model.addAttribute("totalCategorias", totalCategorias);
+        model.addAttribute("totalPerfiles", totalPerfiles);
 
         // 3. Devuelve el nombre de la vista (el archivo HTML) que se debe renderizar.
         // Spring Boot buscará un archivo llamado "index.html" en la carpeta

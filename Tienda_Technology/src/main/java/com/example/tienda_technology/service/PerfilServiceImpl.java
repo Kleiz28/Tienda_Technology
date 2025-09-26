@@ -65,4 +65,9 @@ public class PerfilServiceImpl implements PerfilService {
     public void eliminarPerfil(Long id) {
         perfilRepository.deleteById(id);
     }
+
+    @Override
+    public long countByEstado(boolean estado) {
+        return perfilRepository.countByEstado(true);
+    }
 }

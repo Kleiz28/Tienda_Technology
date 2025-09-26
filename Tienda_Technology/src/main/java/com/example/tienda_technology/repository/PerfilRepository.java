@@ -10,4 +10,6 @@ import java.util.List;
 public interface PerfilRepository extends JpaRepository<Perfil, Long> {
     // Busca todos los perfiles que están activos
     List<Perfil> findByEstadoTrue();
+
+    long countByEstado(boolean estado);
 }
