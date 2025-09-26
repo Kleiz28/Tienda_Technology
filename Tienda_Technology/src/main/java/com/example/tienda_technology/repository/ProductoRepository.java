@@ -45,4 +45,6 @@ public interface ProductoRepository extends JpaRepository<Producto, Long> {
 
     // Buscar productos por categoría (entidad)
     List<Producto> findByCategoriaAndEstado(Categoria categoria, Producto.Estado estado);
+
+    long countByEstado(Producto.Estado estado);
 }

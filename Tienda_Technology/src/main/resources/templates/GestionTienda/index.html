@@ -39,7 +39,6 @@
             </div>
 
             <div class="conjuntoBanner row g-4">
-                <!-- Total de Usuarios -->
                 <div class="bannerGeneral col-sm-6 col-lg-4">
                     <div class="card bannerUsuarios h-100">
                         <div class="card-body">
@@ -58,7 +57,6 @@
                         </div>
                     </div>
                 </div>
-
                 <!-- Nuevo Usuario -->
                 <div class="bannerGeneral col-sm-6 col-lg-4">
                     <div class="card bannerNuevoUsuario h-100">
@@ -94,6 +92,48 @@
                             </div>
                             <a href="#" class="d-block text-warning mt-3 opacity-75 text-decoration-none">
                                 Próximamente...
+                            </a>
+                        </div>
+                    </div>
+                </div>
+                <!-- Total Productos -->
+                <div class="bannerGeneral col-sm-6 col-lg-4">
+                    <div class="card bannerProductos h-100">
+                        <div class="card-body">
+                            <div class="d-flex justify-content-between align-items-start">
+                                <div>
+                                    <h5 class="card-title fw-semibold">Total de Productos</h5>
+                                    <h2 class="display-4 fw-bold" th:text="${totalProductos}">0</h2>
+                                </div>
+                                <div class="card-icon text-success">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" fill="currentColor" class="bi bi-cart-plus-fill" viewBox="0 0 16 16">
+                                        <path d="M.5 1a.5.5 0 0 0 0 1h1.11l.401 1.607 1.498 7.985A.5.5 0 0 0 4 12h1a2 2 0 1 0 0 4 2 2 0 0 0 0-4h7a2 2 0 1 0 0 4 2 2 0 0 0 0-4h1a.5.5 0 0 0 .491-.408l1.5-8A.5.5 0 0 0 14.5 3H2.89l-.405-1.621A.5.5 0 0 0 2 1zM6 14a1 1 0 1 1-2 0 1 1 0 0 1 2 0m7 0a1 1 0 1 1-2 0 1 1 0 0 1 2 0M9 5.5V7h1.5a.5.5 0 0 1 0 1H9v1.5a.5.5 0 0 1-1 0V8H6.5a.5.5 0 0 1 0-1H8V5.5a.5.5 0 0 1 1 0"/>
+                                    </svg>
+                                </div>
+                            </div>
+                            <a th:href="@{/productos/listar}" class="d-block text-success mt-3 opacity-75 text-decoration-none">
+                                Ver detalles &rarr;
+                            </a>
+                        </div>
+                    </div>
+                </div>
+                <!-- Total Categorías -->
+                <div class="bannerGeneral col-sm-6 col-lg-4">
+                    <div class="card bannerCategoria h-100">
+                        <div class="card-body">
+                            <div class="d-flex justify-content-between align-items-start">
+                                <div>
+                                    <h5 class="card-title fw-semibold">Total de Categorías</h5>
+                                    <h2 class="display-4 fw-bold" th:text="${totalCategorias}">0</h2>
+                                </div>
+                                <div class="card-icon text-dark">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" fill="currentColor" class="bi bi-grid" viewBox="0 0 16 16">
+                                        <path d="M1 2.5A1.5 1.5 0 0 1 2.5 1h3A1.5 1.5 0 0 1 7 2.5v3A1.5 1.5 0 0 1 5.5 7h-3A1.5 1.5 0 0 1 1 5.5zM2.5 2a.5.5 0 0 0-.5.5v3a.5.5 0 0 0 .5.5h3a.5.5 0 0 0 .5-.5v-3a.5.5 0 0 0-.5-.5zm6.5.5A1.5 1.5 0 0 1 10.5 1h3A1.5 1.5 0 0 1 15 2.5v3A1.5 1.5 0 0 1 13.5 7h-3A1.5 1.5 0 0 1 9 5.5zm1.5-.5a.5.5 0 0 0-.5.5v3a.5.5 0 0 0 .5.5h3a.5.5 0 0 0 .5-.5v-3a.5.5 0 0 0-.5-.5zM1 10.5A1.5 1.5 0 0 1 2.5 9h3A1.5 1.5 0 0 1 7 10.5v3A1.5 1.5 0 0 1 5.5 15h-3A1.5 1.5 0 0 1 1 13.5zm1.5-.5a.5.5 0 0 0-.5.5v3a.5.5 0 0 0 .5.5h3a.5.5 0 0 0 .5-.5v-3a.5.5 0 0 0-.5-.5zm6.5.5A1.5 1.5 0 0 1 10.5 9h3a1.5 1.5 0 0 1 1.5 1.5v3a1.5 1.5 0 0 1-1.5 1.5h-3A1.5 1.5 0 0 1 9 13.5zm1.5-.5a.5.5 0 0 0-.5.5v3a.5.5 0 0 0 .5.5h3a.5.5 0 0 0 .5-.5v-3a.5.5 0 0 0-.5-.5z"/>
+                                    </svg>
+                                </div>
+                            </div>
+                            <a th:href="@{/categorias/listar}" class="d-block text-dark mt-3 opacity-75 text-decoration-none">
+                                Ver detalles &rarr;
                             </a>
                         </div>
                     </div>

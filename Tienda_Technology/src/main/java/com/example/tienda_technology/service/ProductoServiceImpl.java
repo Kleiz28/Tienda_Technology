@@ -114,4 +114,12 @@ public class ProductoServiceImpl implements ProductoService {
         }
         return productoRepository.existsByCodigoBarrasAndIdNot(codigoBarras, idExcluir);
     }
+
+    @Transactional(readOnly = true)
+    public long contarProductos() {
+        // Contamos solo los usuarios que no están eliminados lógicamente
+        // Nota: Necesitarás crear este método en tu ProductoRepository.
+        // Ejemplo: long countByEstadoNot(Integer estado);
+        return productoRepository.countByEstado(Producto.Estado.ACTIVO);
+    }
 }
