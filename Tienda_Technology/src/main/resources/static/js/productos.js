@@ -107,7 +107,7 @@ $(document).ready(function() {
                 },
                 {
                     data: 'precioUnitario',
-                    render: (data) => `$${parseFloat(data).toFixed(2)}`
+                    render: (data) => `S/ ${parseFloat(data).toFixed(2)}`
                 },
                 {
                     data: 'estado',

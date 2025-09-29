@@ -130,13 +130,7 @@ public class CategoriaController {
     public ResponseEntity<?> cambiarEstadoCategoria(@PathVariable Long id, @RequestParam Categoria.Estado estado) {
         Map<String, Object> response = new HashMap<>();
         try {
-            // Validar si se puede inactivar/eliminar (tiene productos activos)
-            if ((estado == Categoria.Estado.INACTIVO || estado == Categoria.Estado.ELIMINADO) &&
-                    !categoriaService.puedeEliminarse(id)) {
-                response.put("success", false);
-                response.put("message", "No se puede inactivar/eliminar la categoría porque tiene productos activos asociados");
-                return ResponseEntity.badRequest().body(response);
-            }
+
 
             return categoriaService.cambiarEstadoCategoria(id, estado)
                     .map(categoria -> {
