@@ -2,8 +2,11 @@ package com.example.tienda_technology.controller;
 
 import com.example.tienda_technology.model.Categoria;
 import com.example.tienda_technology.model.Producto;
+import com.example.tienda_technology.model.Slider;
 import com.example.tienda_technology.service.CategoriaService;
 import com.example.tienda_technology.service.ProductoService;
+import com.example.tienda_technology.service.SliderService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -13,6 +16,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Controller
@@ -20,6 +24,8 @@ public class TiendaVirtualController {
 
     private final CategoriaService categoriaService;
     private final ProductoService productoService;
+    @Autowired
+    private SliderService sliderService;
 
     public TiendaVirtualController(CategoriaService categoriaService, ProductoService productoService) {
         this.categoriaService = categoriaService;
@@ -154,5 +160,70 @@ public class TiendaVirtualController {
                 .replace("a", "á").replace("e", "é").replace("i", "í")
                 .replace("o", "ó").replace("u", "ú")
                 .replace("n", "ñ");
+    }
+
+    // En TiendaVirtualController.java - Agregar estos métodos
+
+    // Endpoint para obtener sliders del carrusel
+    @GetMapping("/api/tienda/sliders/carrusel")
+    @ResponseBody
+    public ResponseEntity<?> getSlidersCarrusel() {
+        Map<String, Object> response = new HashMap<>();
+        try {
+            List<Slider> sliders = sliderService.listarSlidersActivos()
+                    .stream()
+                    .filter(slider -> !slider.getEsLogo()) // Solo carrusel, no logos
+                    .collect(Collectors.toList());
+
+            List<Map<String, Object>> slidersParaTienda = sliders.stream()
+                    .map(slider -> {
+                        Map<String, Object> sliderMap = new HashMap<>();
+                        sliderMap.put("id", slider.getId());
+                        sliderMap.put("titulo", slider.getTitulo());
+                        sliderMap.put("descripcion", slider.getDescripcion());
+                        sliderMap.put("imagenUrl", slider.getImagenUrl());
+                        sliderMap.put("orden", slider.getOrden());
+                        return sliderMap;
+                    })
+                    .collect(Collectors.toList());
+
+            response.put("success", true);
+            response.put("data", slidersParaTienda);
+            return ResponseEntity.ok(response);
+
+        } catch (Exception e) {
+            response.put("success", false);
+            response.put("message", "Error al cargar sliders");
+            return ResponseEntity.internalServerError().body(response);
+        }
+    }
+
+    // Endpoint para obtener el logo
+    @GetMapping("/api/tienda/logo")
+    @ResponseBody
+    public ResponseEntity<?> getLogo() {
+        Map<String, Object> response = new HashMap<>();
+        try {
+            Optional<Slider> logo = sliderService.obtenerLogo();
+
+            if (logo.isPresent()) {
+                Map<String, Object> logoMap = new HashMap<>();
+                logoMap.put("id", logo.get().getId());
+                logoMap.put("titulo", logo.get().getTitulo());
+                logoMap.put("imagenUrl", logo.get().getImagenUrl());
+
+                response.put("success", true);
+                response.put("data", logoMap);
+            } else {
+                response.put("success", false);
+                response.put("message", "No se encontró logo configurado");
+            }
+            return ResponseEntity.ok(response);
+
+        } catch (Exception e) {
+            response.put("success", false);
+            response.put("message", "Error al cargar logo");
+            return ResponseEntity.internalServerError().body(response);
+        }
     }
 }

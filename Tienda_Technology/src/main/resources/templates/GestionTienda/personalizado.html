@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Personalización de Colores</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link th:href="@{/css/main.css}" rel="stylesheet">
+    <style>
+        .color-preview {
+            width: 50px;
+            height: 30px;
+            border-radius: 4px;
+            border: 1px solid #ddd;
+            cursor: pointer;
+        }
+        .config-card {
+            transition: all 0.3s ease;
+        }
+        .config-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+    </style>
+</head>
+<body>
+
+<div class="d-flex">
+    <div th:replace="~{GestionTienda/sidebar :: sidebar(activeUri='/personalizado')}"></div>
+
+    <main id="main-content" class="main-content w-100">
+        <header class="p-3 mb-3 barraDashboard">
+            <div class="d-flex align-items-center">
+                <button id="open-sidebar" class="btn btn-light d-md-none me-3 p-1">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" class="bi bi-list" viewBox="0 0 16 16"><path fill-rule="evenodd" d="M2.5 12a.5.5 0 0 1 .5-.5h10a.5.5 0 0 1 0 1H3a.5.5 0 0 1-.5-.5m0-4a.5.5 0 0 1 .5-.5h10a.5.5 0 0 1 0 1H3a.5.5 0 0 1-.5-.5m0-4a.5.5 0 0 1 .5-.5h10a.5.5 0 0 1 0 1H3a.5.5 0 0 1-.5-.5"/></svg>
+                </button>
+                <h1 class="h3 mb-0 fw-bold">Personalización de Colores</h1>
+            </div>
+        </header>
+
+        <div class="container-fluid p-4">
+            <div class="row">
+                <div class="col-md-8">
+                    <div class="card shadow-sm rounded-lg">
+                        <div class="card-header bg-white">
+                            <h5 class="card-title mb-0">Configuración de Colores</h5>
+                        </div>
+                        <div class="card-body">
+                            <form id="formColores">
+                                <div id="colores-container">
+                                    <!-- Los colores se cargarán dinámicamente -->
+                                </div>
+                                <div class="mt-4">
+                                    <button type="submit" class="btn btn-primary">Guardar Cambios</button>
+                                    <button type="button" id="btnReset" class="btn btn-outline-secondary">Restablecer Valores</button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-md-4">
+                    <div class="card shadow-sm rounded-lg">
+                        <div class="card-header bg-white">
+                            <h5 class="card-title mb-0">Vista Previa</h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="preview-navbar mb-3 p-3 rounded" style="background-color:  #343a40;">
+                                <span class="text-white">Barra de Navegación</span>
+                            </div>
+                            <div class="preview-button mb-3">
+                                <button class="btn w-100" style="background-color: #0d6efd; color: white;">
+                                    Botón de Ejemplo
+                                </button>
+                            </div>
+                            <div class="preview-footer p-3 rounded" style="background-color:  #343a40;">
+                                <span class="text-white">Footer</span>
+                            </div>
+                            <div class="mt-3">
+                                <small class="text-muted">La vista previa se actualizará automáticamente</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+</div>
+
+<div id="notification-container" class="toast-container position-fixed top-0 end-0 p-3"></div>
+
+<script src="https://code.jquery.com/jquery-3.7.0.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+<script th:src="@{/js/personalizado.js}"></script>
+<script th:src="@{/js/main.js}"></script>
+
+</body>
+</html>

@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Gestión de Sliders</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.13.6/css/dataTables.bootstrap5.min.css">
+  <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/responsive/2.5.0/css/responsive.bootstrap5.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link th:href="@{/css/main.css}" rel="stylesheet">
+</head>
+<body>
+
+<div class="d-flex">
+  <div th:replace="~{GestionTienda/sidebar :: sidebar(activeUri='/sliders')}"></div>
+
+  <main id="main-content" class="main-content w-100">
+    <header class="p-3 mb-3 barraDashboard">
+      <div class="d-flex align-items-center">
+        <button id="open-sidebar" class="btn btn-light d-md-none me-3 p-1">
+          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" class="bi bi-list" viewBox="0 0 16 16"><path fill-rule="evenodd" d="M2.5 12a.5.5 0 0 1 .5-.5h10a.5.5 0 0 1 0 1H3a.5.5 0 0 1-.5-.5m0-4a.5.5 0 0 1 .5-.5h10a.5.5 0 0 1 0 1H3a.5.5 0 0 1-.5-.5m0-4a.5.5 0 0 1 .5-.5h10a.5.5 0 0 1 0 1H3a.5.5 0 0 1-.5-.5"/></svg>
+        </button>
+        <h1 class="h3 mb-0 fw-bold">Gestión de Sliders</h1>
+        <button id="btnNuevoRegistro" class="btn btn-dark ms-auto">
+          Nuevo Slider
+        </button>
+      </div>
+    </header>
+
+    <div class="container-fluid p-4">
+      <div class="card shadow-sm rounded-lg">
+        <div class="card-body">
+          <h2 class="card-title h5 mb-4 fw-bold">Lista de Sliders</h2>
+          <table id="tablaSliders" class="table table-hover responsive" style="width:100%">
+            <thead>
+            <tr>
+              <th>Imagen</th>
+              <th>Título</th>
+              <th>Tipo</th>
+              <th>Orden</th>
+              <th>Estado</th>
+              <th>Acciones</th>
+            </tr>
+            </thead>
+            <tbody></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </main>
+</div>
+
+<!-- Modal Formulario -->
+<div class="modal fade" id="sliderModal" tabindex="-1" aria-labelledby="modalTitle" aria-hidden="true">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="modalTitle">Agregar Slider</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <form id="formSlider" novalidate>
+          <input type="hidden" id="id" name="id">
+          <div class="row g-3">
+            <div class="col-md-6">
+              <label for="titulo" class="form-label">Título:</label>
+              <input type="text" id="titulo" name="titulo" class="form-control" required>
+              <div id="titulo-error" class="invalid-feedback d-block"></div>
+            </div>
+            <div class="col-md-6">
+              <label for="esLogo" class="form-label">Tipo:</label>
+              <select id="esLogo" name="esLogo" class="form-select" required>
+                <option value="false">Imagen de Carrusel</option>
+                <option value="true">Logo</option>
+              </select>
+              <div id="esLogo-error" class="invalid-feedback d-block"></div>
+            </div>
+            <div class="col-12">
+              <label for="descripcion" class="form-label">Descripción:</label>
+              <textarea id="descripcion" name="descripcion" class="form-control" rows="3"></textarea>
+            </div>
+            <div class="col-md-6">
+              <label for="orden" class="form-label">Orden:</label>
+              <input type="number" id="orden" name="orden" class="form-control" min="1" required>
+              <div id="orden-error" class="invalid-feedback d-block"></div>
+            </div>
+            <div class="col-md-6">
+              <label for="activo" class="form-label">Estado:</label>
+              <select id="activo" name="activo" class="form-select" required>
+                <option value="true">Activo</option>
+                <option value="false">Inactivo</option>
+              </select>
+            </div>
+            <div class="col-12">
+              <label for="imagenFile" class="form-label">Imagen:</label>
+              <input class="form-control" type="file" id="imagenFile" accept="image/*">
+              <div class="mt-2 text-center">
+                <img id="imagenPreview" src="" alt="Vista previa" style="max-height: 200px; display: none;">
+              </div>
+            </div>
+          </div>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+        <button type="submit" form="formSlider" class="btn btn-primary">Guardar Slider</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div id="notification-container" class="toast-container position-fixed top-0 end-0 p-3"></div>
+
+<script src="https://code.jquery.com/jquery-3.7.0.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script type="text/javascript" src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
+<script type="text/javascript" src="https://cdn.datatables.net/1.13.6/js/dataTables.bootstrap5.min.js"></script>
+<script type="text/javascript" src="https://cdn.datatables.net/responsive/2.5.0/js/dataTables.responsive.min.js"></script>
+<script type="text/javascript" src="https://cdn.datatables.net/responsive/2.5.0/js/responsive.bootstrap5.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+<script th:src="@{/js/sliders.js}"></script>
+<script th:src="@{/js/main.js}"></script>
+
+</body>
+</html>

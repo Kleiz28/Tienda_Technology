@@ -131,10 +131,104 @@ function getCategoriasPorDefecto() {
     ];
 }
 
+async function cargarSlidersCarrusel() {
+    try {
+        const response = await fetch('/api/tienda/sliders/carrusel');
+        const result = await response.json();
+
+        if (result.success && result.data.length > 0) {
+            actualizarCarrusel(result.data);
+        } else {
+            console.warn('No hay sliders configurados, usando carrusel por defecto');
+        }
+    } catch (error) {
+        console.error('Error cargando sliders:', error);
+    }
+}
+
+function actualizarCarrusel(sliders) {
+    const carouselInner = document.querySelector('.carousel-inner');
+    const carouselIndicators = document.querySelector('.carousel-indicators');
+
+    if (!carouselInner || !carouselIndicators) return;
+
+    // Limpiar carrusel existente
+    carouselInner.innerHTML = '';
+    carouselIndicators.innerHTML = '';
+
+    // Ordenar sliders por orden
+    sliders.sort((a, b) => a.orden - b.orden);
+
+    // Crear nuevos items del carrusel
+    sliders.forEach((slider, index) => {
+        const isActive = index === 0;
+
+        // Crear indicador
+        const indicator = document.createElement('button');
+        indicator.type = 'button';
+        indicator.dataset.bsTarget = '#demo';
+        indicator.dataset.bsSlideTo = index;
+        indicator.className = isActive ? 'active' : '';
+        indicator.setAttribute('aria-current', isActive);
+        indicator.setAttribute('aria-label', `Slide ${index + 1}`);
+        carouselIndicators.appendChild(indicator);
+
+        // Crear item del carrusel
+        const carouselItem = document.createElement('div');
+        carouselItem.className = `carousel-item ${isActive ? 'active' : ''}`;
+        carouselItem.innerHTML = `
+            <img src="${slider.imagenUrl}" 
+                 alt="${slider.titulo}" 
+                 class="d-block w-100"
+                 onerror="this.src='https://via.placeholder.com/800x400?text=Imagen+No+Disponible'">
+            <div class="carousel-caption">
+                <h3>${slider.titulo}</h3>
+                <p>${slider.descripcion || ''}</p>
+            </div>
+        `;
+        carouselInner.appendChild(carouselItem);
+    });
+}
+
+/**
+ * Carga el logo desde la API
+ */
+async function cargarLogo() {
+    try {
+        const response = await fetch('/api/tienda/logo');
+        const result = await response.json();
+
+        if (result.success) {
+            actualizarLogo(result.data);
+        } else {
+            console.warn('No hay logo configurado, usando texto por defecto');
+        }
+    } catch (error) {
+        console.error('Error cargando logo:', error);
+    }
+}
+
+/**
+ * Actualiza el logo en la barra de navegación
+ */
+function actualizarLogo(logoData) {
+    const logoElement = document.querySelector('.navbar-brand');
+    if (!logoElement) return;
+
+    // Reemplazar texto por imagen del logo
+    logoElement.innerHTML = `
+        <img src="${logoData.imagenUrl}" 
+             alt="${logoData.titulo}" 
+             style="height: 40px;"
+             onerror="this.style.display='none'; this.parentElement.textContent='TECHNOLOGY'">
+    `;
+}
+
+
 // Función para inicializar la tienda
 async function inicializarTienda() {
     try {
-        // Cargar categorías y productos en paralelo
+        // Cargar en paralelo: categorías, productos, sliders y logo
         const [categoriasCargadas, productosCargados] = await Promise.all([
             cargarCategoriasDesdeAPI(),
             cargarProductosDesdeAPI()
@@ -149,6 +243,10 @@ async function inicializarTienda() {
         actualizarFiltrosCategorias();
         actualizarCategoriasFooter();
         cargarProductosDestacados();
+
+        // Cargar sliders y logo (no esperar por ellos para no bloquear la UI)
+        cargarSlidersCarrusel();
+        cargarLogo();
 
     } catch (error) {
         console.error('❌ Error inicializando tienda:', error);
