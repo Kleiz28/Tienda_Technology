@@ -31,3 +31,13 @@ build/
 
 ### VS Code ###
 .vscode/
+
+### Carpetas de imagenes ###
+fotos/*.jpg
+fotos/*.png
+fotos/*.jpeg
+fotos/*.gif
+uploads/sliders/*.jpg
+uploads/sliders/*.png
+uploads/sliders/*.jpeg
+uploads/sliders/*.gif

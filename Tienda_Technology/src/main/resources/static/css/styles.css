@@ -15,10 +15,60 @@ body {
     padding-left: 30px;
 }
 
+.navbar-brand-container {
+    display: flex;
+    align-items: center;
+    min-height: 60px;
+}
+
 .navbar-brand {
     color: #04904f;
     font-weight: bold;
     font-size: 1.5em;
+    display: flex;
+    align-items: center;
+    text-decoration: none;
+    transition: all 0.3s ease;
+    height: 100%;
+}
+
+.navbar-brand:hover {
+    color: #04904f;
+    text-decoration: none;
+}
+
+#logo-imagen {
+    transition: all 0.3s ease;
+    display: none;
+    height: 50px; /* Altura fija para el logo */
+    width: auto; /* Ancho automático para mantener proporción */
+    max-width: 200px; /* Ancho máximo */
+    min-width: 100px; /* Ancho mínimo */
+    object-fit: contain;
+}
+
+#logo-texto {
+    transition: all 0.3s ease;
+    display: inline;
+    white-space: nowrap;
+}
+
+/* Cuando hay imagen de logo, ocultar el texto */
+.navbar-brand.has-logo #logo-texto {
+    display: none;
+}
+
+.navbar-brand.has-logo #logo-imagen {
+    display: block;
+}
+
+/* Cuando no hay imagen, mostrar el texto */
+.navbar-brand:not(.has-logo) #logo-texto {
+    display: inline;
+}
+
+.navbar-brand:not(.has-logo) #logo-imagen {
+    display: none;
 }
 
 .nav-link {
@@ -323,6 +373,18 @@ footer .redes {
     .carousel-caption p {
         font-size: 0.9rem;
     }
+    .navbar-brand-container {
+        min-height: 50px;
+    }
+
+    #logo-imagen {
+        height: 40px; /* Un poco más pequeño en móviles */
+        max-width: 150px;
+    }
+
+    #logo-texto {
+        font-size: 1.3em;
+    }
 }
 
 @media (max-width: 576px) {
@@ -336,5 +398,13 @@ footer .redes {
 
     .carousel-caption p {
         font-size: 0.8rem;
+    }
+    #logo-imagen {
+        height: 35px;
+        max-width: 120px;
+    }
+
+    #logo-texto {
+        font-size: 1.2em;
     }
 }

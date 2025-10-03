@@ -235,30 +235,60 @@ async function cargarLogo() {
         console.log('📦 Respuesta logo:', result);
 
         if (result.success && result.data) {
-            console.log('✅ Logo cargado correctamente');
+            console.log('✅ Logo cargado correctamente desde API');
             actualizarLogo(result.data);
         } else {
             console.warn('⚠️ No hay logo configurado, usando texto por defecto');
+            // Asegurarse de que se muestre el texto
+            const logoElement = document.querySelector('.navbar-brand');
+            if (logoElement) {
+                logoElement.classList.remove('has-logo');
+            }
         }
     } catch (error) {
         console.error('❌ Error cargando logo:', error);
+        // En caso de error, mostrar texto
+        const logoElement = document.querySelector('.navbar-brand');
+        if (logoElement) {
+            logoElement.classList.remove('has-logo');
+        }
     }
 }
 
 function actualizarLogo(logoData) {
     const logoElement = document.querySelector('.navbar-brand');
-    if (!logoElement) return;
+    const logoImagen = document.getElementById('logo-imagen');
+    const logoTexto = document.getElementById('logo-texto');
+
+    if (!logoElement || !logoImagen || !logoTexto) return;
 
     const imagenUrl = logoData.imagenUrlCompleta ||
         (logoData.imagenUrl ? `/sliders/${logoData.imagenUrl}` : null);
 
     if (imagenUrl) {
-        logoElement.innerHTML = `
-            <img src="${imagenUrl}" 
-                 alt="${logoData.titulo || 'Logo'}" 
-                 style="height: 40px; max-width: 150px; object-fit: contain;"
-                 onerror="this.style.display='none'; this.parentElement.textContent='TECHNOLOGY'">
-        `;
+        // Configurar la imagen del logo
+        logoImagen.src = imagenUrl;
+        logoImagen.alt = logoData.titulo || 'TECHNOLOGY';
+
+        // Usar las clases CSS que ya definiste
+        logoElement.classList.add('has-logo');
+
+        // Verificar si la imagen se carga correctamente
+        const img = new Image();
+        img.src = imagenUrl;
+        img.onload = function() {
+            console.log('✅ Logo cargado correctamente:', imagenUrl);
+            // Las clases CSS se encargan de mostrar/ocultar
+        };
+        img.onerror = function() {
+            console.error('❌ Error al cargar el logo:', imagenUrl);
+            // Si hay error, mostrar texto
+            logoElement.classList.remove('has-logo');
+        };
+    } else {
+        // No hay logo configurado, mostrar texto
+        console.log('ℹ️ No hay logo configurado, mostrando texto');
+        logoElement.classList.remove('has-logo');
     }
 }
 
