@@ -67,14 +67,11 @@ public class UsuarioService {
                         .orElseThrow(() -> new IllegalArgumentException("Usuario no encontrado para actualizar"));
             }
 
-            // Manejo de contraseñas
             if (usuarioExistente != null) {
                 // Usuario existente - actualización
-                // Si no se proporciona nueva contraseña, mantener la actual
                 if (usuario.getClave() == null || usuario.getClave().trim().isEmpty()) {
                     usuario.setClave(usuarioExistente.getClave());
                 } else {
-                    // Encriptar nueva contraseña
                     usuario.setClave(passwordEncoder.encode(usuario.getClave().trim()));
                 }
             } else {
@@ -82,9 +79,7 @@ public class UsuarioService {
                 if (usuario.getClave() == null || usuario.getClave().trim().isEmpty()) {
                     throw new IllegalArgumentException("La contraseña es obligatoria para nuevos usuarios");
                 }
-                // Encriptar contraseña
                 usuario.setClave(passwordEncoder.encode(usuario.getClave().trim()));
-                // Asignar estado activo por defecto a nuevos usuarios
                 usuario.setEstado(1);
             }
 
