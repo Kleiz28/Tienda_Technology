@@ -185,20 +185,21 @@ $(document).ready(function() {
             formData.append('eliminarFoto', 'true');
         }
 
-        // Datos del usuario como JSON (SOLO campos que existen en la entidad Usuario)
+        // Datos del usuario como JSON
         const usuarioData = {
             id: $('#id').val() || null,
             nombre: $('#nombre').val().trim(),
             usuario: $('#usuario').val().trim(),
-            clave: $('#clave').val(), // Puede estar vacío en edición
+            clave: $('#clave').val(),
             correo: $('#correo').val().trim(),
             perfil: {
-                id: $('#id_perfil').val()
+                id: $('#id_perfil').val() ? parseInt($('#id_perfil').val()) : null
             }
-            // NO incluir fotoActual aquí - se maneja separadamente
         };
 
-        // Validación básica del lado cliente (CORREGIDA para contraseña)
+        console.log('Datos a enviar:', usuarioData);
+
+        // Validación básica del lado cliente
         if (!validateForm(usuarioData)) {
             return;
         }
@@ -217,26 +218,42 @@ $(document).ready(function() {
             method: 'POST',
             body: formData
         })
-            .then(response => response.json())
+            .then(async response => {
+                console.log('Status:', response.status, response.statusText);
+
+                const contentType = response.headers.get('content-type');
+                const text = await response.text();
+
+                console.log('Content-Type:', contentType);
+                console.log('Respuesta cruda:', text.substring(0, 200)); // Primeros 200 chars
+
+                if (!contentType || !contentType.includes('application/json')) {
+                    throw new Error(`El servidor devolvió HTML en lugar de JSON. Posible error 500. Respuesta: ${text.substring(0, 100)}`);
+                }
+
+                return JSON.parse(text);
+            })
             .then(data => {
+                console.log('Respuesta parseada:', data);
+
                 if (data.success) {
                     hideModal();
                     showNotification(data.message, 'success');
-                    loadUsuarios(); // Recargar la tabla
+                    loadUsuarios();
                 } else {
-                    if (data.errors) {
-                        // Mostrar errores de validación del servidor
-                        Object.keys(data.errors).forEach(field => {
-                            showFieldError(field, data.errors[field]);
-                        });
-                    } else {
-                        showNotification(data.message, 'error');
-                    }
+                    showNotification(data.message || 'Error desconocido', 'error');
                 }
             })
             .catch(error => {
-                console.error('Error:', error);
-                showNotification('Error de conexión al guardar usuario', 'error');
+                console.error('Error completo:', error);
+
+                if (error.message.includes('HTML')) {
+                    showNotification('Error interno del servidor. Revisa los logs del servidor.', 'error');
+                } else if (error.message.includes('Failed to fetch')) {
+                    showNotification('Error de conexión con el servidor', 'error');
+                } else {
+                    showNotification('Error: ' + error.message, 'error');
+                }
             })
             .finally(() => {
                 showLoading(false);
