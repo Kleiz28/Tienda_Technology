@@ -1,7 +1,7 @@
 package com.example.tienda_technology.controller;
 
 import com.example.tienda_technology.model.Slider;
-import com.example.tienda_technology.service.SliderService;
+import com.example.tienda_technology.service.impl.SliderService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
@@ -10,6 +10,8 @@ import org.springframework.web.multipart.MultipartFile;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Controller
 @RequestMapping("/sliders")
@@ -49,7 +51,7 @@ public class SliderController {
             @RequestParam(value = "descripcion", required = false) String descripcion,
             @RequestParam("esLogo") Boolean esLogo,
             @RequestParam("orden") Integer orden,
-            @RequestParam("activo") Boolean activo,
+            @RequestParam("activo") Slider.Estado activo,
             @RequestParam(value = "imagenFile", required = false) MultipartFile imagenFile,
             @RequestParam(value = "id", required = false) Long id) {
 
@@ -63,7 +65,7 @@ public class SliderController {
             slider.setDescripcion(descripcion);
             slider.setEsLogo(esLogo);
             slider.setOrden(orden);
-            slider.setActivo(activo);
+            slider.setEstado(activo);
 
             Slider sliderGuardado = sliderService.guardarSlider(slider, imagenFile);
             response.put("success", true);
@@ -77,9 +79,31 @@ public class SliderController {
         }
     }
 
+    @GetMapping("/api/{id}")
+    @ResponseBody
+    public ResponseEntity<?> obtenerSlider(@PathVariable Long id) {
+        Map<String, Object> response = new HashMap<>();
+        try {
+            Optional<Slider> slider = sliderService.obtenerPorId(id);
+            if (slider.isPresent()) {
+                response.put("success", true);
+                response.put("data", slider.get());
+                return ResponseEntity.ok(response);
+            } else {
+                response.put("success", false);
+                response.put("message", "Slider no encontrado");
+                return ResponseEntity.notFound().build();
+            }
+        } catch (Exception e) {
+            response.put("success", false);
+            response.put("message", "Error al obtener slider");
+            return ResponseEntity.internalServerError().body(response);
+        }
+    }
+
     @PostMapping("/api/cambiar-estado/{id}")
     @ResponseBody
-    public ResponseEntity<?> cambiarEstado(@PathVariable Long id, @RequestParam Boolean activo) {
+    public ResponseEntity<?> cambiarEstado(@PathVariable Long id, @RequestParam Slider.Estado activo) {
         Map<String, Object> response = new HashMap<>();
         try {
             sliderService.cambiarEstado(id, activo);
@@ -105,6 +129,47 @@ public class SliderController {
         } catch (Exception e) {
             response.put("success", false);
             response.put("message", "Error al eliminar slider");
+            return ResponseEntity.internalServerError().body(response);
+        }
+    }
+
+    @GetMapping("/api/tienda/sliders/carrusel")
+    @ResponseBody
+    public ResponseEntity<?> obtenerSlidersCarrusel() {
+        Map<String, Object> response = new HashMap<>();
+        try {
+            List<Slider> sliders = sliderService.listarSlidersActivos()
+                    .stream()
+                    .filter(slider -> !slider.getEsLogo()) // Excluir logos
+                    .collect(Collectors.toList());
+
+            response.put("success", true);
+            response.put("data", sliders);
+            return ResponseEntity.ok(response);
+        } catch (Exception e) {
+            response.put("success", false);
+            response.put("message", "Error al cargar sliders del carrusel");
+            return ResponseEntity.internalServerError().body(response);
+        }
+    }
+
+    @GetMapping("/api/tienda/logo")
+    @ResponseBody
+    public ResponseEntity<?> obtenerLogoTienda() {
+        Map<String, Object> response = new HashMap<>();
+        try {
+            Optional<Slider> logo = sliderService.obtenerLogo();
+            if (logo.isPresent()) {
+                response.put("success", true);
+                response.put("data", logo.get());
+            } else {
+                response.put("success", false);
+                response.put("message", "No hay logo configurado");
+            }
+            return ResponseEntity.ok(response);
+        } catch (Exception e) {
+            response.put("success", false);
+            response.put("message", "Error al cargar logo");
             return ResponseEntity.internalServerError().body(response);
         }
     }

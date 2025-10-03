@@ -1,4 +1,4 @@
-package com.example.tienda_technology.service;
+package com.example.tienda_technology.service.impl;
 
 import com.example.tienda_technology.model.ConfiguracionApp;
 import com.example.tienda_technology.repository.ConfiguracionAppRepository;

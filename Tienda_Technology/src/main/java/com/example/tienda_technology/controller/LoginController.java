@@ -3,7 +3,7 @@ package com.example.tienda_technology.controller;
 
 import com.example.tienda_technology.model.Opcion;
 import com.example.tienda_technology.model.Usuario;
-import com.example.tienda_technology.service.UsuarioService;
+import com.example.tienda_technology.service.impl.UsuarioService;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;

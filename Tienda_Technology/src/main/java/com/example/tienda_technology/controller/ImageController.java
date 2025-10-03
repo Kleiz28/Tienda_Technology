@@ -16,10 +16,22 @@ import java.nio.file.Paths;
 public class ImageController {
 
     @Value("${file.upload-dir}")
-    private String uploadDir;
+    private String fotosUploadDir;
+
+    @Value("${slider.upload-dir}")
+    private String slidersUploadDir;
 
     @GetMapping("/fotos/{filename:.+}")
-    public ResponseEntity<Resource> serveFile(@PathVariable String filename) {
+    public ResponseEntity<Resource> serveFoto(@PathVariable String filename) {
+        return serveFile(filename, fotosUploadDir);
+    }
+
+    @GetMapping("/sliders/{filename:.+}")
+    public ResponseEntity<Resource> serveSlider(@PathVariable String filename) {
+        return serveFile(filename, slidersUploadDir);
+    }
+
+    private ResponseEntity<Resource> serveFile(String filename, String uploadDir) {
         try {
             Path file = Paths.get(uploadDir).resolve(filename);
             Resource resource = new UrlResource(file.toUri());
@@ -29,7 +41,6 @@ public class ImageController {
                         .header(HttpHeaders.CONTENT_DISPOSITION, "inline; filename=\"" + resource.getFilename() + "\"")
                         .body(resource);
             } else {
-                // Retornar una imagen por defecto si no existe
                 return ResponseEntity.notFound().build();
             }
         } catch (Exception e) {

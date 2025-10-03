@@ -2,13 +2,11 @@ package com.example.tienda_technology.controller;
 
 import com.example.tienda_technology.model.Usuario;
 import com.example.tienda_technology.service.PerfilService;
-import com.example.tienda_technology.service.UsuarioService;
-import jakarta.validation.Valid;
+import com.example.tienda_technology.service.impl.UsuarioService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.validation.BindingResult;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;

@@ -18,8 +18,8 @@ public class Slider {
     @Column(length = 200)
     private String descripcion;
 
-    @Column(name = "imagen_url", nullable = false, length = 500)
-    private String imagenUrl;
+    @Column(name = "imagen_url", length = 500)
+    private String imagenUrl; // Solo guardar el nombre del archivo
 
     @Column(name = "es_logo", nullable = false)
     private Boolean esLogo = false;
@@ -27,8 +27,20 @@ public class Slider {
     @Column(nullable = false)
     private Integer orden = 1;
 
+    @Enumerated(EnumType.STRING)
     @Column(nullable = false)
-    private Boolean activo = true;
+    private Estado estado = Estado.ACTIVO;
+
+    public enum Estado {
+        ACTIVO,
+        INACTIVO,
+        ELIMINADO
+    }
+
+    // Método helper para obtener la URL completa de la imagen
+    public String getImagenUrlCompleta() {
+        return this.imagenUrl != null ? "/sliders/" + this.imagenUrl : null;
+    }
 
     // Getters y Setters
     public Long getId() { return id; }
@@ -49,6 +61,6 @@ public class Slider {
     public Integer getOrden() { return orden; }
     public void setOrden(Integer orden) { this.orden = orden; }
 
-    public Boolean getActivo() { return activo; }
-    public void setActivo(Boolean activo) { this.activo = activo; }
+    public Estado getEstado() { return estado; }
+    public void setEstado(Estado estado) { this.estado = estado; }
 }

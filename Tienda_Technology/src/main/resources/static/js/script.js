@@ -133,16 +133,26 @@ function getCategoriasPorDefecto() {
 
 async function cargarSlidersCarrusel() {
     try {
-        const response = await fetch('/api/tienda/sliders/carrusel');
-        const result = await response.json();
+        console.log('🔄 Cargando sliders del carrusel...');
+        const response = await fetch('/sliders/api/tienda/sliders/carrusel');
 
-        if (result.success && result.data.length > 0) {
+        if (!response.ok) {
+            throw new Error(`Error HTTP: ${response.status}`);
+        }
+
+        const result = await response.json();
+        console.log('📦 Respuesta sliders:', result);
+
+        if (result.success && result.data && result.data.length > 0) {
+            console.log(`✅ Sliders cargados: ${result.data.length}`);
             actualizarCarrusel(result.data);
         } else {
-            console.warn('No hay sliders configurados, usando carrusel por defecto');
+            console.warn('⚠️ No hay sliders configurados o la respuesta está vacía');
+            usarCarruselPorDefecto();
         }
     } catch (error) {
-        console.error('Error cargando sliders:', error);
+        console.error('❌ Error cargando sliders:', error);
+        usarCarruselPorDefecto();
     }
 }
 
@@ -150,17 +160,20 @@ function actualizarCarrusel(sliders) {
     const carouselInner = document.querySelector('.carousel-inner');
     const carouselIndicators = document.querySelector('.carousel-indicators');
 
-    if (!carouselInner || !carouselIndicators) return;
+    if (!carouselInner || !carouselIndicators) {
+        console.error('❌ No se encontraron elementos del carrusel');
+        return;
+    }
 
     // Limpiar carrusel existente
     carouselInner.innerHTML = '';
     carouselIndicators.innerHTML = '';
 
     // Ordenar sliders por orden
-    sliders.sort((a, b) => a.orden - b.orden);
+    const slidersOrdenados = [...sliders].sort((a, b) => a.orden - b.orden);
 
     // Crear nuevos items del carrusel
-    sliders.forEach((slider, index) => {
+    slidersOrdenados.forEach((slider, index) => {
         const isActive = index === 0;
 
         // Crear indicador
@@ -176,18 +189,34 @@ function actualizarCarrusel(sliders) {
         // Crear item del carrusel
         const carouselItem = document.createElement('div');
         carouselItem.className = `carousel-item ${isActive ? 'active' : ''}`;
+
+        // Usar imagenUrlCompleta si está disponible, si no construir la URL
+        const imagenUrl = slider.imagenUrlCompleta ||
+            (slider.imagenUrl ? `/sliders/${slider.imagenUrl}` :
+                'https://via.placeholder.com/800x400?text=Imagen+No+Disponible');
+
         carouselItem.innerHTML = `
-            <img src="${slider.imagenUrl}" 
-                 alt="${slider.titulo}" 
-                 class="d-block w-100"
+            <img src="${imagenUrl}" 
+                 alt="${slider.titulo || 'Slider'}" 
+                 class="d-block w-100 carousel-image"
                  onerror="this.src='https://via.placeholder.com/800x400?text=Imagen+No+Disponible'">
+            ${slider.titulo || slider.descripcion ? `
             <div class="carousel-caption">
-                <h3>${slider.titulo}</h3>
-                <p>${slider.descripcion || ''}</p>
+                ${slider.titulo ? `<h3>${slider.titulo}</h3>` : ''}
+                ${slider.descripcion ? `<p>${slider.descripcion}</p>` : ''}
             </div>
+            ` : ''}
         `;
         carouselInner.appendChild(carouselItem);
     });
+
+    // Reiniciar el carrusel para que funcione con los nuevos elementos
+    const carousel = new bootstrap.Carousel(document.getElementById('demo'));
+}
+
+function usarCarruselPorDefecto() {
+    console.log('🔄 Usando carrusel por defecto');
+    // El carrusel por defecto ya está en el HTML, no necesitamos hacer nada
 }
 
 /**
@@ -195,33 +224,42 @@ function actualizarCarrusel(sliders) {
  */
 async function cargarLogo() {
     try {
-        const response = await fetch('/api/tienda/logo');
-        const result = await response.json();
+        console.log('🔄 Cargando logo...');
+        const response = await fetch('/sliders/api/tienda/logo');
 
-        if (result.success) {
+        if (!response.ok) {
+            throw new Error(`Error HTTP: ${response.status}`);
+        }
+
+        const result = await response.json();
+        console.log('📦 Respuesta logo:', result);
+
+        if (result.success && result.data) {
+            console.log('✅ Logo cargado correctamente');
             actualizarLogo(result.data);
         } else {
-            console.warn('No hay logo configurado, usando texto por defecto');
+            console.warn('⚠️ No hay logo configurado, usando texto por defecto');
         }
     } catch (error) {
-        console.error('Error cargando logo:', error);
+        console.error('❌ Error cargando logo:', error);
     }
 }
 
-/**
- * Actualiza el logo en la barra de navegación
- */
 function actualizarLogo(logoData) {
     const logoElement = document.querySelector('.navbar-brand');
     if (!logoElement) return;
 
-    // Reemplazar texto por imagen del logo
-    logoElement.innerHTML = `
-        <img src="${logoData.imagenUrl}" 
-             alt="${logoData.titulo}" 
-             style="height: 40px;"
-             onerror="this.style.display='none'; this.parentElement.textContent='TECHNOLOGY'">
-    `;
+    const imagenUrl = logoData.imagenUrlCompleta ||
+        (logoData.imagenUrl ? `/sliders/${logoData.imagenUrl}` : null);
+
+    if (imagenUrl) {
+        logoElement.innerHTML = `
+            <img src="${imagenUrl}" 
+                 alt="${logoData.titulo || 'Logo'}" 
+                 style="height: 40px; max-width: 150px; object-fit: contain;"
+                 onerror="this.style.display='none'; this.parentElement.textContent='TECHNOLOGY'">
+        `;
+    }
 }
 
 
@@ -244,9 +282,9 @@ async function inicializarTienda() {
         actualizarCategoriasFooter();
         cargarProductosDestacados();
 
-        // Cargar sliders y logo (no esperar por ellos para no bloquear la UI)
-        cargarSlidersCarrusel();
-        cargarLogo();
+        // Cargar sliders y logo
+        await cargarSlidersCarrusel();
+        await cargarLogo();
 
     } catch (error) {
         console.error('❌ Error inicializando tienda:', error);
@@ -255,6 +293,7 @@ async function inicializarTienda() {
         productosDesdeAPI = productos;
         actualizarFiltrosCategorias();
         actualizarCategoriasFooter();
+        cargarSlidersCarrusel().catch(e => console.error('Error cargando carrusel:', e));
     }
 }
 
@@ -698,7 +737,7 @@ document.addEventListener('DOMContentLoaded', async function() {
     window.eliminarDelCarrito = eliminarDelCarrito;
     window.actualizarCarrito = actualizarCarrito;
     window.filtrarProductos = filtrarProductos;
-    window.filtrarPorCategoria = filtrarPorCategoria;
+
     window.ordenarProductos = ordenarProductos;
     window.buscarProductos = buscarProductos;
     window.limpiarBusqueda = limpiarBusqueda;
@@ -708,6 +747,16 @@ document.addEventListener('DOMContentLoaded', async function() {
 
     if (document.getElementById('carrito').classList.contains('activa')) {
         actualizarCarrito();
+    }
+
+    // Inicializar carrusel de Bootstrap si existe
+    const carouselElement = document.getElementById('demo');
+    if (carouselElement) {
+        new bootstrap.Carousel(carouselElement, {
+            interval: 5000, // 5 segundos
+            wrap: true,
+            pause: 'hover'
+        });
     }
 });
 

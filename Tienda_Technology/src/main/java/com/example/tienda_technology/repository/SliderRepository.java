@@ -7,7 +7,7 @@ import java.util.List;
 
 @Repository
 public interface SliderRepository extends JpaRepository<Slider, Long> {
-    List<Slider> findByActivoTrueOrderByOrdenAsc();
-    List<Slider> findByEsLogoAndActivoTrue(Boolean esLogo);
-    List<Slider> findByEsLogoFalseAndActivoTrueOrderByOrdenAsc();
+    List<Slider> findByEstadoOrderByOrdenAsc(Slider.Estado estado);
+    List<Slider> findByEsLogoAndEstado(Boolean esLogo, Slider.Estado estado);
+    List<Slider> findByEsLogoFalseAndEstadoOrderByOrdenAsc(Slider.Estado estado);
 }

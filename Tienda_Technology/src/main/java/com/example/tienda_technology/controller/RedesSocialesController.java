@@ -1,7 +1,7 @@
 package com.example.tienda_technology.controller;
 
 import com.example.tienda_technology.model.ConfiguracionApp;
-import com.example.tienda_technology.service.ConfiguracionAppService;
+import com.example.tienda_technology.service.impl.ConfiguracionAppService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;

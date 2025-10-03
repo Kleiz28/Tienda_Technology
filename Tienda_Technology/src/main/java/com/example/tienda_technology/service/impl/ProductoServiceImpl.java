@@ -1,7 +1,8 @@
-package com.example.tienda_technology.service;
+package com.example.tienda_technology.service.impl;
 
 import com.example.tienda_technology.model.Producto;
 import com.example.tienda_technology.repository.ProductoRepository;
+import com.example.tienda_technology.service.ProductoService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 

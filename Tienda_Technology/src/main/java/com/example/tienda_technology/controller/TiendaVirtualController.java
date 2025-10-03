@@ -5,7 +5,7 @@ import com.example.tienda_technology.model.Producto;
 import com.example.tienda_technology.model.Slider;
 import com.example.tienda_technology.service.CategoriaService;
 import com.example.tienda_technology.service.ProductoService;
-import com.example.tienda_technology.service.SliderService;
+import com.example.tienda_technology.service.impl.SliderService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;

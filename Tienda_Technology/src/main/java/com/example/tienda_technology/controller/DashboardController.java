@@ -3,10 +3,10 @@ package com.example.tienda_technology.controller;
 
 // Importaciones de clases necesarias de otros paquetes.
 
-import com.example.tienda_technology.service.CategoriaServiceImpl;
-import com.example.tienda_technology.service.PerfilServiceImpl;
-import com.example.tienda_technology.service.ProductoServiceImpl;
-import com.example.tienda_technology.service.UsuarioService;
+import com.example.tienda_technology.service.impl.CategoriaServiceImpl;
+import com.example.tienda_technology.service.impl.PerfilServiceImpl;
+import com.example.tienda_technology.service.impl.ProductoServiceImpl;
+import com.example.tienda_technology.service.impl.UsuarioService;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;

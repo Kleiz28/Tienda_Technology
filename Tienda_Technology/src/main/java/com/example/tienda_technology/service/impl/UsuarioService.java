@@ -1,4 +1,4 @@
-package com.example.tienda_technology.service;
+package com.example.tienda_technology.service.impl;
 
 import com.example.tienda_technology.model.Usuario;
 import com.example.tienda_technology.repository.UsuarioRepository;
