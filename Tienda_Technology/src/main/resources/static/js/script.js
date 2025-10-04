@@ -1,6 +1,135 @@
 let carrito = JSON.parse(localStorage.getItem('carrito')) || [];
 let categorias = [];
 let productosDesdeAPI = [];
+
+let configuracionesTienda = {};
+
+// Función para cargar configuraciones de la tienda
+async function cargarConfiguracionesTienda() {
+    try {
+        console.log('🔄 Cargando configuraciones de la tienda...');
+        const response = await fetch('/personalizado/api/tienda/configuraciones');
+
+        if (!response.ok) {
+            throw new Error(`Error HTTP: ${response.status}`);
+        }
+
+        const result = await response.json();
+        console.log('📦 Configuraciones cargadas:', result);
+
+        if (result.success && result.data) {
+            configuracionesTienda = result.data;
+            console.log('✅ Configuraciones cargadas correctamente');
+            aplicarConfiguracionesTienda();
+        } else {
+            console.warn('⚠️ No se pudieron cargar las configuraciones');
+        }
+    } catch (error) {
+        console.error('❌ Error cargando configuraciones:', error);
+    }
+}
+
+// Función para aplicar las configuraciones
+function aplicarConfiguracionesTienda() {
+    aplicarColoresPersonalizados();
+    actualizarRedesSocialesFooter();
+}
+
+// Función para aplicar colores personalizados
+function aplicarColoresPersonalizados() {
+    const root = document.documentElement;
+
+    // Colores del navbar
+    if (configuracionesTienda.COLOR_NAVBAR) {
+        root.style.setProperty('--navbar-bg-color', configuracionesTienda.COLOR_NAVBAR);
+        document.querySelector('.navbar').style.backgroundColor = configuracionesTienda.COLOR_NAVBAR;
+    }
+
+    // Colores del footer
+    if (configuracionesTienda.COLOR_FOOTER) {
+        root.style.setProperty('--footer-bg-color', configuracionesTienda.COLOR_FOOTER);
+        document.querySelector('footer').style.backgroundColor = configuracionesTienda.COLOR_FOOTER;
+    }
+
+    // Color de botones primarios
+    if (configuracionesTienda.COLOR_BOTONES) {
+        root.style.setProperty('--primary-color', configuracionesTienda.COLOR_BOTONES);
+        aplicarColorBotones(configuracionesTienda.COLOR_BOTONES);
+    }
+
+    // Color primario general
+    if (configuracionesTienda.COLOR_PRIMARIO) {
+        root.style.setProperty('--primary-accent', configuracionesTienda.COLOR_PRIMARIO);
+    }
+
+    // Color secundario
+    if (configuracionesTienda.COLOR_SECUNDARIO) {
+        root.style.setProperty('--secondary-color', configuracionesTienda.COLOR_SECUNDARIO);
+    }
+}
+
+// Función para aplicar color a los botones
+function aplicarColorBotones(color) {
+    const buttons = document.querySelectorAll('.btn-primary');
+    buttons.forEach(btn => {
+        btn.style.backgroundColor = color;
+        btn.style.borderColor = color;
+    });
+
+    // También aplicar a botones outline
+    const outlineButtons = document.querySelectorAll('.btn-outline-primary');
+    outlineButtons.forEach(btn => {
+        btn.style.color = color;
+        btn.style.borderColor = color;
+    });
+}
+
+// Función para actualizar redes sociales en el footer
+function actualizarRedesSocialesFooter() {
+    const redesContainer = document.querySelector('footer .redes');
+    if (!redesContainer) return;
+
+    redesContainer.innerHTML = '';
+
+    const redesConfig = {
+        'FACEBOOK_URL': { icon: 'bi-facebook', class: 'text-primary' },
+        'INSTAGRAM_URL': { icon: 'bi-instagram', class: 'text-warning' },
+        'TWITTER_URL': { icon: 'bi-twitter', class: 'text-info' },
+        'WHATSAPP_NUMERO': { icon: 'bi-whatsapp', class: 'text-success' }
+    };
+
+    let hasRedes = false;
+
+    Object.keys(redesConfig).forEach(clave => {
+        const url = configuracionesTienda[clave];
+        if (url && url.trim() !== '') {
+            hasRedes = true;
+            const red = redesConfig[clave];
+            let urlFinal = url;
+
+            // Formatear URL de WhatsApp
+            if (clave === 'WHATSAPP_NUMERO' && !url.startsWith('http')) {
+                const numero = url.replace(/\D/g, '');
+                urlFinal = `https://wa.me/${numero}`;
+            }
+
+            const link = document.createElement('a');
+            link.href = urlFinal;
+            link.className = `text-decoration-none ${red.class} me-3`;
+            link.target = '_blank';
+            link.innerHTML = `<i class="bi ${red.icon}" style="font-size: 1.5rem;"></i>`;
+
+            redesContainer.appendChild(link);
+        }
+    });
+
+    if (!hasRedes) {
+        redesContainer.innerHTML = `
+            <small class="text-muted">Síguenos en nuestras redes sociales</small>
+        `;
+    }
+}
+
 // Guardar carrito en localStorage
 function guardarCarrito() {
     localStorage.setItem('carrito', JSON.stringify(carrito));
@@ -312,9 +441,12 @@ async function inicializarTienda() {
         actualizarCategoriasFooter();
         cargarProductosDestacados();
 
-        // Cargar sliders y logo
-        await cargarSlidersCarrusel();
-        await cargarLogo();
+        // Cargar elementos visuales
+        await Promise.all([
+            cargarSlidersCarrusel(),
+            cargarLogo(),
+            cargarConfiguracionesTienda() // ✅ NUEVO: Cargar configuraciones
+        ]);
 
     } catch (error) {
         console.error('❌ Error inicializando tienda:', error);
@@ -323,7 +455,11 @@ async function inicializarTienda() {
         productosDesdeAPI = productos;
         actualizarFiltrosCategorias();
         actualizarCategoriasFooter();
+
+        // Cargar elementos visuales con manejo de errores individual
         cargarSlidersCarrusel().catch(e => console.error('Error cargando carrusel:', e));
+        cargarLogo().catch(e => console.error('Error cargando logo:', e));
+        cargarConfiguracionesTienda().catch(e => console.error('Error cargando configuraciones:', e));
     }
 }
 

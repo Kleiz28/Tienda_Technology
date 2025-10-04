@@ -108,16 +108,16 @@ $(document).ready(function() {
             let cssVar = '';
             switch(config.clave) {
                 case 'COLOR_NAVBAR':
-                    cssVar = '--navbar-color';
+                    cssVar = '--navbar-bg-color';
                     break;
                 case 'COLOR_FOOTER':
-                    cssVar = '--footer-color';
+                    cssVar = '--footer-bg-color';
                     break;
                 case 'COLOR_BOTONES':
                     cssVar = '--button-color';
                     break;
                 case 'COLOR_PRIMARIO':
-                    cssVar = '--primary-color';
+                    cssVar = '--primary-accent';
                     break;
                 case 'COLOR_SECUNDARIO':
                     cssVar = '--secondary-color';
@@ -125,6 +125,15 @@ $(document).ready(function() {
             }
             if (cssVar) {
                 document.documentElement.style.setProperty(cssVar, config.valor);
+
+                // Actualizar elementos específicos en la vista previa
+                if (config.clave === 'COLOR_NAVBAR') {
+                    document.querySelector('.preview-navbar').style.backgroundColor = config.valor;
+                } else if (config.clave === 'COLOR_FOOTER') {
+                    document.querySelector('.preview-footer').style.backgroundColor = config.valor;
+                } else if (config.clave === 'COLOR_BOTONES') {
+                    document.querySelector('.preview-button .btn').style.backgroundColor = config.valor;
+                }
             }
         });
     }

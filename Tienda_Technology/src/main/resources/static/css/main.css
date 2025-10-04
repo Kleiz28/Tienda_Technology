@@ -76,7 +76,7 @@ body {
 .sidebarDinamic .botonSalirApp {
     color: #ffffff !important;
     font-weight: 600;
-    padding: 12px 50px ;
+    padding: 8px 50px ;
     transition: all 0.3s ease;
 }
 

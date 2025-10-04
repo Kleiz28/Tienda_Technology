@@ -55,4 +55,28 @@ public class RedesSocialesController {
             return ResponseEntity.internalServerError().body(response);
         }
     }
+
+    @GetMapping("/api/tienda/redes")
+    @ResponseBody
+    public ResponseEntity<?> obtenerRedesSocialesTienda() {
+        Map<String, Object> response = new HashMap<>();
+        try {
+            Map<String, String> configuraciones = configuracionAppService.obtenerConfiguracionesComoMapa();
+            // Filtrar solo las redes sociales
+            Map<String, String> redes = new HashMap<>();
+            configuraciones.forEach((clave, valor) -> {
+                if (clave.contains("FACEBOOK") || clave.contains("INSTAGRAM") ||
+                        clave.contains("TWITTER") || clave.contains("WHATSAPP")) {
+                    redes.put(clave, valor);
+                }
+            });
+            response.put("success", true);
+            response.put("data", redes);
+            return ResponseEntity.ok(response);
+        } catch (Exception e) {
+            response.put("success", false);
+            response.put("message", "Error al obtener redes sociales");
+            return ResponseEntity.internalServerError().body(response);
+        }
+    }
 }

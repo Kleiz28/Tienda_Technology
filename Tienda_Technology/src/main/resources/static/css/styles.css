@@ -1,4 +1,13 @@
 /*=============================================== GENERAL =============================================*/
+:root {
+    --primary-color: #04904f;
+    --secondary-color: #6c757d;
+    --navbar-bg-color: #ffffff;
+    --footer-bg-color: #16151e;
+    --button-color: #04904f;
+    --primary-accent: #04904f;
+}
+
 
 body {
     background-color: #f8f9fa;
@@ -7,8 +16,8 @@ body {
 }
 
 .navbar {
-    background-color: rgb(255, 255, 255);
-    box-shadow: 0 2px 10px rgba(2, 133, 57, 0.8);
+    background-color: var(--navbar-bg-color);
+    box-shadow: 0 2px 10px rgba(16, 17, 16, 0.8);
 }
 
 .navbar .nav-item {
@@ -22,7 +31,7 @@ body {
 }
 
 .navbar-brand {
-    color: #04904f;
+    color: var(--primary-accent);
     font-weight: bold;
     font-size: 1.5em;
     display: flex;
@@ -77,31 +86,31 @@ body {
 }
 
 .nav-link:hover, .nav-link.active {
-    color: #04904f;
+    color: var(--primary-accent);
 }
 
 .btn-primary {
-    background-color: #04904f;
-    border-color: #04904f;
+    background-color: var(--button-color);
+    border-color: var(--button-color);
     font-weight: bold;
     padding: 5px 10px;
     align-items: center;
 }
 
 .btn-primary:hover {
-    background-color: #0f3f08;
-    border-color: #04904f;
+    background-color: var(--primary-accent);
+    border-color: var(--button-color);
     color: #ffffff;
 
 }
 
 .btn-outline-primary {
-    color: #04904f;
-    border-color: #04904f;
+    color: var(--button-color);
+    border-color: var(--button-color);
 }
 
 .btn-outline-primary:hover {
-    background-color: #04904f;
+    background-color: var(--button-color);
     color: white;
 }
 
@@ -189,12 +198,12 @@ body {
 }
 
 .precio {
-    color: #04904f;
+    color: var(--primary-accent);
     font-weight: bold;
 }
 
 .filtro-btn.activo {
-    background-color: #04904f;
+    background-color: var(--primary-accent);
     color: white;
 }
 
@@ -208,7 +217,7 @@ body {
 /*=============================================== CONTACTANOS =============================================*/
 
 .iconos i{
-    color: #04904f;
+    color: var(--primary-accent);
 }
 
 .iconos h5{
